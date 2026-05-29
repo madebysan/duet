@@ -514,7 +514,7 @@ private struct VolumeStepper: View {
                     .background(MixTheme.surface)
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Lower volume by 10 percent")
+            .accessibilityLabel("Lower volume")
 
             VStack(spacing: 1) {
                 Text("\(volumePercentage)%")
@@ -539,7 +539,7 @@ private struct VolumeStepper: View {
                     .foregroundStyle(MixTheme.background)
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Raise volume by 10 percent")
+            .accessibilityLabel("Raise volume")
         }
         .frame(height: 48)
         .padding(.horizontal, 8)
@@ -555,8 +555,12 @@ private struct VolumeStepper: View {
     }
 
     private func adjustVolume(by delta: Double) {
-        let steppedValue = ((volume + delta) * 10).rounded() / 10
-        volume = min(max(steppedValue, 0), 1)
+        let stepSize: Double = delta > 0
+            ? (volume < 0.10 ? 0.01 : 0.05)
+            : (volume <= 0.10 ? 0.01 : 0.05)
+        let snapped = (volume / stepSize).rounded() * stepSize
+        let next = snapped + (delta > 0 ? stepSize : -stepSize)
+        volume = min(max(next, 0), 1)
     }
 }
 
