@@ -13,8 +13,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     @Published var shuffleEnabled = true
     @Published var volume: Float = 0.32 {
         didSet {
-            volume = min(max(volume, 0), 1)
-            player?.volume = volume
+            player?.volume = min(max(volume, 0), 1)
             updateNowPlayingInfo()
         }
     }
@@ -73,24 +72,19 @@ final class AudioPlayerModel: NSObject, ObservableObject {
 
     func importFiles(urls: [URL]) {
         stop()
-        stopFolderAccess(resetLibraryName: false)
-        stopFileAccess(resetLibraryName: false)
+
+        // When in folder mode, switching to file mode — start fresh
+        if folderURL != nil {
+            stopFolderAccess(resetLibraryName: false)
+            selectedFileURLs = []
+        }
 
         var acceptedURLs: [URL] = []
-        var seenPaths = Set<String>()
 
         for url in urls {
             guard supportedExtensions.contains(url.pathExtension.lowercased()) else {
                 continue
             }
-
-            let standardizedURL = url.standardizedFileURL
-            let key = standardizedURL.path
-            guard !seenPaths.contains(key) else {
-                continue
-            }
-
-            seenPaths.insert(key)
 
             if url.startAccessingSecurityScopedResource() {
                 securityScopedFileURLs.append(url)
@@ -100,21 +94,82 @@ final class AudioPlayerModel: NSObject, ObservableObject {
             }
         }
 
-        guard !acceptedURLs.isEmpty else {
-            tracks = []
-            currentTrack = nil
-            playbackDuration = 0
-            libraryName = "Selected Files"
-            status = "No playable files"
-            return
-        }
+        guard !acceptedURLs.isEmpty else { return }
 
-        selectedFileURLs = acceptedURLs
-        libraryName = acceptedURLs.count == 1 ? acceptedURLs[0].deletingPathExtension().lastPathComponent : "Selected Files"
+        // Append to existing library, de-duplicating by URL
+        let existing = Set(selectedFileURLs)
+        let new = acceptedURLs.filter { !existing.contains($0) }
+        guard !new.isEmpty else { return }
+
+        selectedFileURLs.append(contentsOf: new)
+        updateLibraryName()
+        folderURL = nil
+        isAccessingFolder = false
         status = "Loading files"
 
         Task {
             await refreshTracks()
+        }
+    }
+
+    private func updateLibraryName() {
+        guard !selectedFileURLs.isEmpty else {
+            libraryName = "Sample Library"
+            return
+        }
+
+        if selectedFileURLs.count == 1 {
+            libraryName = selectedFileURLs[0].deletingPathExtension().lastPathComponent
+        } else {
+            let parents = Set(selectedFileURLs.map { $0.deletingLastPathComponent().standardizedFileURL.path })
+            libraryName = parents.count == 1 ? selectedFileURLs[0].deletingLastPathComponent().lastPathComponent : "Selected Files"
+        }
+    }
+
+    func clearLibrary() {
+        stop()
+        selectedFileURLs = []
+        stopFileAccess(resetLibraryName: true)
+        folderURL = nil
+        isAccessingFolder = false
+        tracks = []
+        currentTrack = nil
+        playbackDuration = 0
+        libraryName = "Sample Library"
+        status = "Ready"
+    }
+
+    func removeTrack(_ track: AudioTrack) {
+        guard let index = tracks.firstIndex(of: track) else { return }
+
+        tracks.remove(at: index)
+
+        // Remove from selectedFileURLs if present
+        if let urlIndex = selectedFileURLs.firstIndex(of: track.url) {
+            selectedFileURLs.remove(at: urlIndex)
+        }
+
+        // Stop security-scoped access if this was a security-scoped URL
+        if let scopedIndex = securityScopedFileURLs.firstIndex(of: track.url) {
+            track.url.stopAccessingSecurityScopedResource()
+            securityScopedFileURLs.remove(at: scopedIndex)
+        }
+
+        // If this was the current track, move to next or stop
+        if currentTrack == track {
+            if tracks.isEmpty {
+                currentTrack = nil
+                stop()
+            } else {
+                play(track: tracks[0])
+            }
+        }
+
+        updateLibraryName()
+
+        if tracks.isEmpty {
+            libraryName = "Sample Library"
+            status = "Ready"
         }
     }
 
@@ -158,7 +213,11 @@ final class AudioPlayerModel: NSObject, ObservableObject {
 
     func togglePlayback() {
         guard let player else {
-            playSample()
+            if let currentTrack {
+                play(track: currentTrack)
+            } else {
+                playSample()
+            }
             return
         }
 
@@ -241,18 +300,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     }
 
     private func bundledTracks() async -> [AudioTrack] {
-        guard let url = Bundle.main.url(forResource: "mixlayer-test", withExtension: "m4a") else {
-            return []
-        }
-
-        return [
-            await AudioTrack.load(
-                url: url,
-                titleOverride: "MixLayer Test Loop",
-                source: .bundled,
-                loops: true
-            )
-        ]
+        return []
     }
 
     private func folderTracks() async -> [AudioTrack] {

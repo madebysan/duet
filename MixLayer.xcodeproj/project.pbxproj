@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		174C9AF3970E389DE63E4B12 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */; };
-		19E6E27196730CE03F9E7ED9 /* mixlayer-test.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 233D12CA120A5A9D74D77044 /* mixlayer-test.m4a */; };
 		1E19ED569C40C02C5D57D28F /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCAE3E696F830330ED7D710 /* AudioTrack.swift */; };
 		55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10C7EFFECD522436263FB73 /* Assets.xcassets */; };
 		AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */; };
@@ -19,7 +18,6 @@
 /* Begin PBXFileReference section */
 		1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		20240D3D5D0D618FFD839FCD /* MixLayer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MixLayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		233D12CA120A5A9D74D77044 /* mixlayer-test.m4a */ = {isa = PBXFileReference; path = "mixlayer-test.m4a"; sourceTree = "<group>"; };
 		612543094381786A9E1F77D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B10C7EFFECD522436263FB73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B57B6372699CE4A803DCFDC2 /* AudioMetadataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMetadataCache.swift; sourceTree = "<group>"; };
@@ -47,7 +45,6 @@
 		77B4113C05BED17D9BC41486 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				233D12CA120A5A9D74D77044 /* mixlayer-test.m4a */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -129,7 +126,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */,
-				19E6E27196730CE03F9E7ED9 /* mixlayer-test.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

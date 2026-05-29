@@ -4,9 +4,7 @@ import UIKit
 
 struct ContentView: View {
     @EnvironmentObject private var player: AudioPlayerModel
-    @State private var isImportingFolder = false
     @State private var isImportingFiles = false
-    @State private var isImportMenuPresented = false
     @State private var isQueuePresented = false
     @State private var pulseTrigger = 0
 
@@ -68,30 +66,6 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .confirmationDialog("Add Music", isPresented: $isImportMenuPresented, titleVisibility: .visible) {
-            Button("Choose Folder") {
-                isImportingFolder = true
-            }
-
-            Button("Pick Files") {
-                isImportingFiles = true
-            }
-        }
-        .fileImporter(
-            isPresented: $isImportingFolder,
-            allowedContentTypes: [.folder],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    haptic(.heavy)
-                    player.importFolder(url: url)
-                }
-            case .failure:
-                break
-            }
-        }
         .fileImporter(
             isPresented: $isImportingFiles,
             allowedContentTypes: [.audio],
@@ -113,16 +87,6 @@ struct ContentView: View {
                     haptic(.medium)
                     player.play(track: track)
                     isQueuePresented = false
-                },
-                onImportFolder: {
-                    haptic(.medium)
-                    isQueuePresented = false
-                    isImportingFolder = true
-                },
-                onImportFiles: {
-                    haptic(.medium)
-                    isQueuePresented = false
-                    isImportingFiles = true
                 }
             )
             .presentationDetents([.medium, .large])
@@ -158,7 +122,7 @@ struct ContentView: View {
             HStack(spacing: 10) {
                 IconCircleButton(systemName: "folder.fill", accent: accent) {
                     haptic(.medium)
-                    isImportMenuPresented = true
+                    isImportingFiles = true
                 }
                 .accessibilityLabel("Add music")
 
@@ -622,15 +586,13 @@ private struct TrackQueueSheet: View {
     @ObservedObject var player: AudioPlayerModel
     let accent: Color
     let onPickTrack: (AudioTrack) -> Void
-    let onImportFolder: () -> Void
-    let onImportFiles: () -> Void
 
     var body: some View {
         ZStack {
             MixTheme.background.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 18) {
-                HStack {
+                HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("LIBRARY")
                             .font(MixTheme.label)
@@ -647,28 +609,19 @@ private struct TrackQueueSheet: View {
 
                     Spacer()
 
-                    HStack(spacing: 8) {
-                        Button(action: onImportFiles) {
-                            Label("FILES", systemImage: "doc.fill")
-                                .font(MixTheme.sublabel)
-                                .tracking(1.4)
-                                .foregroundStyle(MixTheme.textPrimary)
-                                .padding(.horizontal, 12)
-                                .frame(height: 38)
-                                .background(MixTheme.surfaceLight)
-                                .clipShape(Capsule())
+                    if !player.tracks.isEmpty {
+                        Button("Clear") {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                player.clearLibrary()
+                            }
                         }
-
-                        Button(action: onImportFolder) {
-                            Label("FOLDER", systemImage: "folder.fill")
-                                .font(MixTheme.sublabel)
-                                .tracking(1.4)
-                                .foregroundStyle(MixTheme.background)
-                                .padding(.horizontal, 12)
-                                .frame(height: 38)
-                                .background(accent)
-                                .clipShape(Capsule())
-                        }
+                        .font(MixTheme.label)
+                        .tracking(1.8)
+                        .foregroundStyle(MixTheme.textTertiary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(MixTheme.surface)
+                        .clipShape(Capsule())
                     }
                 }
                 .padding(.horizontal, 22)
@@ -684,6 +637,16 @@ private struct TrackQueueSheet: View {
                                 accent: accent
                             ) {
                                 onPickTrack(track)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        player.removeTrack(track)
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red.opacity(0.8))
                             }
                         }
                     }
