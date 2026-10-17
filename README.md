@@ -1,6 +1,6 @@
-<p><img src="assets/app-icon.png" width="128" height="128" alt="MixLayer app icon"></p>
+<p><img src="assets/app-icon.png" width="128" height="128" alt="Duet app icon"></p>
 
-<h1>MixLayer</h1>
+<h1>Duet</h1>
 
 <p>Play local audio quietly under another iPhone app.<br>
 Built for music, loops, and audiobooks while YouTube or another audio app keeps playing.</p>
@@ -13,11 +13,11 @@ Built for music, loops, and audiobooks while YouTube or another audio app keeps 
   <img src="https://img.shields.io/badge/iOS-000000" alt="iOS">
 </p>
 
-![MixLayer player screen](artifacts/visual-qa/03-bottom-aligned.jpg)
+![Duet player screen](artifacts/visual-qa/03-bottom-aligned.jpg)
 
-MixLayer uses a mixable `AVAudioSession` so its audio keeps playing when another app starts audio — YouTube, Podcasts, Spotify, anything. iOS normally lets these apps interrupt each other; MixLayer runs under them.
+Duet uses a mixable `AVAudioSession` so its audio keeps playing when another app starts audio — YouTube, Podcasts, Spotify, anything. iOS normally lets these apps interrupt each other; Duet runs under them.
 
-The library picks one folder (recursive) or individual files. Metadata (title, artist, album, artwork, accent color) is scanned and cached locally. Google Drive requires the `Pick Files` button because Drive often greys out folder access in the Files provider.
+Everything is on one screen: a big play button, a drag-to-set volume bar, and a CD library. Built-in sounds (white, pink, and brown noise for now) sit on a shelf as discs; tapping one slides it out of its case and it spins while playing. Your own files (from Files, iCloud, or Google Drive) become a "burned" disc, are remembered across launches, and play as Loop one, Play all, or Shuffle.
 
 Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 
@@ -25,16 +25,21 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 
 | File | Role |
 |---|---|
-| `MixLayerApp.swift` | App entry point. Creates `AudioPlayerModel` as a `@StateObject`, boots the library on launch, supports `--autoplay-sample` arg for QA. |
-| `AudioPlayerModel.swift` | Core model — audio session config, file import, queue management, playback controls, metadata caching. |
-| `AudioTrack.swift` | `AudioTrack` struct with URL, metadata, play status. The `load()` factory reads audio metadata. |
-| `AudioMetadataCache.swift` | Simple on-device cache so switching back to the same folder or files is faster. |
-| `ContentView.swift` | Main UI — player view, track queue sheet, library source picker. |
+| `MixLayerApp.swift` | App entry point. Creates `AudioPlayerModel`, boots the library on launch, supports `--autoplay-sample` for QA (plays the first sound). |
+| `AudioPlayerModel.swift` | Core model: mixable audio session, built-in sounds, your files with bookmarks, modes, volume, interruptions, lock-screen controls. |
+| `PlaybackLogic.swift` | Pure, unit-tested logic: playback modes and queue order, volume stepping, disc spin math. |
+| `SoundCatalog.swift` | Built-in sounds and their disc finishes (sheen, case color, glow). |
+| `AudioTrack.swift` | `AudioTrack` for a sound or a file; `load()` reads file metadata. |
+| `AudioMetadataCache.swift` | On-device metadata cache so reopening the same files is fast. |
+| `ContentView.swift` | The one screen: header, disc stage, now playing, volume, Sounds shelf, Your files list. |
+| `DiscViews.swift` | Disc face, spinning disc, case, and the slide-out stage. |
+| `VolumeBar.swift` | Drag-to-set volume bar with − and + nudges. |
+| `scripts/generate-noise.py` | Regenerates the seamless noise loops in `MixLayer/Resources/Sounds/`. |
 | `project.yml` | XcodeGen source. Re-generate with `xcodegen generate` if changed. |
 
 ## Agent Onboarding
 
-If you are starting work on MixLayer, read these first in order:
+If you are starting work on Duet, read these first in order:
 
 1. **`AGENTS.md`** — build/install commands, constraint rules (`.mixWithOthers`, folder mode, etc.)
 2. **`plan.md`** — current state, verification commands, known open questions
@@ -59,7 +64,7 @@ rm -rf build/DerivedData
 ## Key Constraints
 
 - **Do not remove `.mixWithOthers`** — this is the entire point of the app.
-- **One active library**, not a multi-folder queue.
+- **Import by picking files only.** Folder import was removed on 2026-10-17.
 - **Google Drive support stays as file-picker fallback** unless Drive API integration is explicitly requested.
 - **Never commit `build/`** or DerivedData.
 

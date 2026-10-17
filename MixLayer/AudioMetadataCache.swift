@@ -58,7 +58,7 @@ final class AudioMetadataCache {
             let data = try JSONEncoder().encode(payload)
             try data.write(to: cacheURL, options: [.atomic])
         } catch {
-            print("MixLayer metadata cache save failed: \(error.localizedDescription)")
+            print("Duet metadata cache save failed: \(error.localizedDescription)")
         }
     }
 

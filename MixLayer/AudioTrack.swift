@@ -5,8 +5,8 @@ import UIKit
 
 struct AudioTrack: Identifiable, Equatable {
     enum Source: String {
-        case bundled
-        case folder
+        case sound
+        case file
     }
 
     let id: String
@@ -18,7 +18,8 @@ struct AudioTrack: Identifiable, Equatable {
     let artwork: UIImage?
     let accentColor: UIColor
     let source: Source
-    let loops: Bool
+    /// Catalog id when this track is a built-in sound.
+    let soundID: String?
 
     struct MetadataSnapshot: Codable, Equatable {
         let title: String
@@ -67,11 +68,27 @@ struct AudioTrack: Identifiable, Equatable {
 
     var sourceLabel: String {
         switch source {
-        case .bundled:
+        case .sound:
             "Built-in"
-        case .folder:
-            "Folder"
+        case .file:
+            "Your files"
         }
+    }
+
+    var isSound: Bool { source == .sound }
+
+    static func builtIn(_ sound: BuiltInSound, url: URL) -> AudioTrack {
+        AudioTrack(
+            url: url,
+            title: sound.name,
+            artist: nil,
+            album: nil,
+            duration: 0,
+            artwork: nil,
+            accentColor: UIColor(sound.finish.glow),
+            source: .sound,
+            soundID: sound.id
+        )
     }
 
     var metadataSnapshot: MetadataSnapshot {
@@ -82,7 +99,6 @@ struct AudioTrack: Identifiable, Equatable {
         url: URL,
         titleOverride: String? = nil,
         source: Source,
-        loops: Bool = false,
         cachedMetadata: MetadataSnapshot? = nil
     ) async -> AudioTrack {
         if let cachedMetadata {
@@ -95,7 +111,7 @@ struct AudioTrack: Identifiable, Equatable {
                 artwork: cachedMetadata.artwork,
                 accentColor: cachedMetadata.accentColor,
                 source: source,
-                loops: loops
+                soundID: nil
             )
         }
 
@@ -112,7 +128,7 @@ struct AudioTrack: Identifiable, Equatable {
             artwork: artwork,
             accentColor: artwork?.averageColor?.saturatedAccent ?? AudioTrack.fallbackAccent(for: titleOverride ?? metadata.title ?? fallbackTitle),
             source: source,
-            loops: loops
+            soundID: nil
         )
     }
 
@@ -125,7 +141,7 @@ struct AudioTrack: Identifiable, Equatable {
         artwork: UIImage?,
         accentColor: UIColor,
         source: Source,
-        loops: Bool
+        soundID: String?
     ) {
         self.url = url
         self.title = title
@@ -135,8 +151,8 @@ struct AudioTrack: Identifiable, Equatable {
         self.artwork = artwork
         self.accentColor = accentColor
         self.source = source
-        self.loops = loops
-        self.id = "\(source.rawValue)-\(url.absoluteString)"
+        self.soundID = soundID
+        self.id = soundID.map { "sound-\($0)" } ?? "\(source.rawValue)-\(url.absoluteString)"
     }
 
     static func == (lhs: AudioTrack, rhs: AudioTrack) -> Bool {

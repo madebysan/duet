@@ -12,7 +12,7 @@ struct MixLayerApp: App {
                     await player.bootstrapLibrary()
                     if ProcessInfo.processInfo.arguments.contains("--autoplay-sample") {
                         try? await Task.sleep(for: .milliseconds(600))
-                        player.playSample()
+                        player.togglePlayback()
                     }
                 }
         }

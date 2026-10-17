@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17
+
+- Renamed the app to Duet (home-screen name, in-app header, VoiceOver label, logs). Internal Xcode project, target, and bundle id still use MixLayer.
+- Replaced the app icon with the two-overlapping-records design and regenerated every icon size from the 1024 px master.
+- Rebuilt the UI as one screen with a CD library: discs slide out of their case and spin while playing, a drag-to-set volume bar, Sounds and Your files tabs.
+- Added generated white, pink, and brown noise as built-in looping sounds; Rain, Forest, and Ocean are placeholders.
+- Your files are remembered across launches; added Loop one, Play all, and Shuffle; removed folder import.
+- Fixed play doing nothing on first launch, no resume after interruptions, and swipe-to-delete not working.
+- Added a unit test target for playback logic.
+- Built and installed on san's iPhone.
+
 ## 2026-05-28
 
 - Created the MixLayer iOS app as a personal device build.

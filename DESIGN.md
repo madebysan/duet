@@ -1,91 +1,104 @@
-# MixLayer Design
+# Duet Design
 
 ## Atmosphere
 
-Dark, quiet, and music-first. The app should feel closer to a tiny listening tool than a file manager. Artwork and metadata carry most of the visual personality, with controls staying compact and predictable.
+Dark, quiet, and tactile. Duet should feel like a small CD player you reach for, not a file manager: open it, set the level, pick a disc, leave. Each sound is a physical disc in a case; the disc's finish carries the color, and the screen glows faintly in that color.
+
+Reference: Untitled's disc flows on Mobbin (disc slides out of its case while playing, shelf of iridescent discs). Fallback direction if this doesn't hold up: a TIDE-style full-screen ambient home (see `backlog.md`, UI).
 
 ## Colors
 
 | Token | Value | Use |
 |---|---:|---|
-| `background` | `#0A0A0A` | Full-screen app background |
-| `surface` | `#1A1A1A` | Icon buttons and list rows |
-| `surfaceLight` | `#262626` | Secondary pills and volume capsule |
-| `textPrimary` | `#FFFFFF` | Track title, key controls |
-| `textSecondary` | `#9E9E9E` | Labels and metadata |
-| `textTertiary` | `#616161` | Muted status text |
-| `fallbackAccent` | `#1AA6FF` | Default accent when artwork has no color |
+| `background` | `#0A0A0A` | Full-screen app background, disc spindle hole |
+| `surface` | `#1A1A1A` | Nudge buttons, tab track, Add files, mode pills |
+| `surfaceLight` | `#262626` | Volume bar track, selected tab |
+| `textPrimary` | `#FFFFFF` | Titles, play button fill, selected mode pill |
+| `textSecondary` | `#9E9E9E` | Subtitles, labels |
+| `textTertiary` | `#616161` | "Soon" discs, durations |
+| `accent` | `#1AA6FF` | Playing-row waveform, fallback glow |
 
-Track artwork can override the accent color. That accent is used for play state, progress, primary pills, and current-track markers.
+Each built-in sound has a `DiscFinish` in `SoundCatalog.swift`: a sheen (colors swept around the disc), a case color, and a glow. The glow tints the top-of-screen radial light and the volume fill. Your files use the silver `burned` finish; a file with artwork uses its artwork accent instead.
 
 ## Typography
 
-System fonts only. Display text uses rounded system type. Labels use monospaced system type with uppercase tracking.
+System fonts only, rounded design for display text.
 
 | Role | Style |
 |---|---|
-| Track title | 27 pt, bold, rounded |
-| Transport icons | 22 to 31 pt, semibold/bold |
-| Header label | 13 pt, semibold, monospaced |
-| Sublabel | 11 pt, semibold, monospaced |
-| Track row title | 16 pt, semibold, rounded |
+| App title | 24 pt, bold, rounded |
+| Now playing title | 22 pt, bold, rounded |
+| Volume percent | 17 pt, bold, rounded, monospaced digits |
+| Tabs, mode pills, shelf labels | 13 to 14 pt, semibold |
+| Subtitles, status | 12 to 13 pt, medium |
 
 ## Shape Language
 
-Artwork has a large continuous radius. Transport controls are circles. Utility controls are capsules. Repeated rows use rounded rectangles with a 16 pt radius.
+Discs are circles with a translucent inner ring and a dark spindle hole. Cases are 18 pt continuous rounded squares with a hinge line on the left. Controls are circles (play, nudges) or capsules (tabs, mode pills). The volume bar and Add files use a 14 pt radius.
 
-## Spacing Rhythm
+## Layout
 
-The layout is bottom-weighted. Header, artwork, and metadata stay tighter together. Progress, transport, shuffle, and volume controls sit near the lower half so the screen does not feel top-heavy.
+One screen, top to bottom: header with the mixing status, the disc stage (case plus disc), now playing title with the play button, volume bar, Sounds / Your files tabs, then the shelf or file list filling the rest. No sheets for core actions.
 
-## Depth
+## Motion
 
-Depth comes from blurred artwork in the background, soft accent glows, and subtle strokes. Avoid heavy cards or nested containers.
+| Moment | Motion |
+|---|---|
+| Track loaded | Disc slides out of the case to the right, spring (response 0.45, damping 0.82) |
+| Switching discs | Old disc tucks in (ease-in 0.22 s), case and color swap, new disc slides out |
+| Play | Disc eases up to one turn per 2.6 s over 0.6 s |
+| Pause | Disc spins down over 0.6 s and stays out of the case |
+| Play button, discs, Add files | Press scale to 0.92 with a short spring |
+| Volume drag | Selection haptic every 5 percent |
 
-## Animation
-
-Use short spring feedback for taps and play-state changes. Motion should feel responsive, not decorative.
+Reduce Motion turns off the spin; the slide still happens. Rotation is a pure function of time (`DiscSpin` in `PlaybackLogic.swift`), so it never drifts or jumps when pausing.
 
 ## Patterns
 
 | Pattern | Current decision |
 |---|---|
-| Library source | One folder at a time, or selected files as a provider fallback |
-| Google Drive | Folder selection may be greyed out, use `Pick Files` |
-| Metadata | Read once, cache locally by file path, file size, and modification date |
-| Volume | Two buttons, 10% increments, visible percentage |
-| Shuffle | Compact icon pill, not a wide command button |
-| Empty library | Preserve the sample track until a user picks folder/files |
+| Built-in sounds | Generated white, pink, and brown noise loops (`scripts/generate-noise.py`); Rain, Forest, Ocean show as "Soon" until sourced |
+| Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
+| Folder import | Removed; picking files is the only import path |
+| Modes | Sounds always loop one. Your files: Loop one, Play all (default), Shuffle |
+| Volume | Wide fill bar, drag to any whole percent; − and + step 1% up to 10%, then 5% |
+| Long files | Elapsed of total in the subtitle, no scrubber |
+| Metadata | Read once, cached locally by file path, size, and modification date |
+| Removing files | Swipe a row, or "Remove all files" in the ⋯ menu |
 
 ## Shared Components
 
 | Component | Variants | Sizes | File | Usages |
 |---|---|---|---|---:|
-| `PlayerBackground` | artwork, fallback | full screen | `MixLayer/ContentView.swift` | 1 |
-| `ArtworkHero` | artwork, fallback glyph | responsive square | `MixLayer/ContentView.swift` | 1 |
-| `ProgressStrip` | current track | full width | `MixLayer/ContentView.swift` | 1 |
-| `TransportControls` | previous, play/pause, next | circular | `MixLayer/ContentView.swift` | 1 |
-| `VolumeStepper` | minus, percent, plus | capsule | `MixLayer/ContentView.swift` | 1 |
-| `IconCircleButton` | folder/menu, library | 45 pt | `MixLayer/ContentView.swift` | 2 |
-| `TrackQueueSheet` | library sheet | medium/large sheet | `MixLayer/ContentView.swift` | 1 |
-| `TrackRow` | current, idle | 58 pt artwork row | `MixLayer/ContentView.swift` | 1 |
-| `SmallArtwork` | artwork, fallback glyph | 58 pt | `MixLayer/ContentView.swift` | 1 |
+| `DiscFace` | any `DiscFinish` | square, scales | `MixLayer/DiscViews.swift` | 2 |
+| `SpinningDisc` | spinning, settling, resting | square | `MixLayer/DiscViews.swift` | 1 |
+| `DiscCase` | sound symbol, file artwork, "Your mix", empty | 136 pt | `MixLayer/DiscViews.swift` | 1 |
+| `DiscStage` | disc in, disc out | 136 pt case | `MixLayer/DiscViews.swift` | 1 |
+| `VolumeBar` | tinted by glow | full width, 48 pt | `MixLayer/VolumeBar.swift` | 1 |
+| `LibraryTabPicker` | Sounds, Your files | full width, 34 pt | `MixLayer/ContentView.swift` | 1 |
+| `SoundShelf` / `ShelfDisc` / `ComingSoonDisc` | loaded, idle, soon | 78 pt discs, 3 columns | `MixLayer/ContentView.swift` | 1 |
+| `FilesPanel` / `FileRow` | empty state, list, current, playing | 44 pt artwork rows | `MixLayer/ContentView.swift` | 1 |
+| `PressScaleStyle` | — | — | `MixLayer/ContentView.swift` | 3 |
 
 ## Decisions
 
 | Date | Decision | Rationale |
 |---|---|---|
 | 2026-05-28 | Use a mixable playback audio session | The whole app exists to keep playing under YouTube or another audio app |
-| 2026-05-28 | Keep folder mode to one active library | A queue made from multiple folders is harder to reason about and not needed |
-| 2026-05-28 | Scan subfolders | Audiobooks and music libraries often nest files by author, album, or chapter |
-| 2026-05-28 | Cache metadata locally | san expects to reuse a small number of folders, so repeat scans should feel fast |
-| 2026-05-28 | Add file-pick fallback | Google Drive often blocks folder-level Files access on iOS |
+| 2026-05-28 | Cache metadata locally | san reuses a small set of files, so repeat loads should feel fast |
 | 2026-05-28 | Use a bitmap app icon | The app should not ship with a generic generated SVG mark |
+| 2026-10-17 | One screen: play, volume, then Sounds / Your files | The job is get in, set it, get out |
+| 2026-10-17 | CD library based on Untitled's disc flows | Tactile, memorable, and each sound gets an identity |
+| 2026-10-17 | Drop folder import, keep file picking only | The folder button was unreachable and Google Drive greys out folders anyway |
+| 2026-10-17 | Remember picked files with bookmarks | Re-picking every launch was the biggest friction |
+| 2026-10-17 | Disc stays out on pause, spins down over 0.6 s | Pauses are brief; tucking in would read as "stopped" |
+| 2026-10-17 | No layering of several sounds yet | It turns one volume into several and adds a mixer screen |
 
 ## Anti-Patterns
 
-- Do not bring back a huge shuffle button.
-- Do not stretch the layout horizontally when the selected track changes.
+- Do not bring back a big artwork hero, a scrubber, or previous/next buttons on the main screen.
 - Do not stack cards inside cards.
 - Do not make the UI feel like a file browser first.
-- Do not add Google Drive API work unless the file-picker fallback proves insufficient.
+- Do not use `.swipeActions` outside a `List`; it silently does nothing.
+- Do not reassign a `@Published` property inside its own `didSet` unconditionally; it recurses and crashes.
+- Do not add Google Drive API work unless the file picker proves insufficient.
