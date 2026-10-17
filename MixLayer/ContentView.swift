@@ -275,7 +275,7 @@ private struct ShelfDisc: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            DiscFace(finish: sound.finish)
+            DiscFace(finish: sound.finish, artwork: sound.artwork)
                 .frame(width: 78, height: 78)
                 .padding(4)
                 .overlay(
@@ -297,15 +297,23 @@ private struct ComingSoonDisc: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Circle()
-                .strokeBorder(MixTheme.textTertiary, style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-                .frame(width: 78, height: 78)
-                .overlay(
-                    Text("Soon")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(MixTheme.textTertiary)
-                )
-                .padding(4)
+            ZStack {
+                DiscFace(finish: sound.finish, artwork: sound.artwork)
+                    .saturation(0.2)
+                    .opacity(0.3)
+
+                Circle()
+                    .strokeBorder(MixTheme.textTertiary, style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+
+                Text("Soon")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(MixTheme.textPrimary.opacity(0.8))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(MixTheme.background.opacity(0.7)))
+            }
+            .frame(width: 78, height: 78)
+            .padding(4)
 
             Text(sound.name)
                 .font(.system(size: 13, weight: .semibold))

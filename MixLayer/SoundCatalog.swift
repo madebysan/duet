@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// The printed look of a disc and its case.
 struct DiscFinish: Equatable {
@@ -27,6 +28,9 @@ struct BuiltInSound: Identifiable, Equatable {
     let finish: DiscFinish
 
     var isAvailable: Bool { fileName != nil }
+
+    /// Art printed on the disc: `disc-<id>` in Assets.xcassets/DiscArt. Replace the image there to change it.
+    var artwork: UIImage? { UIImage(named: "disc-\(id)") }
 
     var url: URL? {
         guard let fileName else { return nil }

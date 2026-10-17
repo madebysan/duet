@@ -34,6 +34,7 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 | `ContentView.swift` | The one screen: header, disc stage, now playing, volume, Sounds shelf, Your files list. |
 | `DiscViews.swift` | Disc face, spinning disc, case, and the slide-out stage. |
 | `VolumeBar.swift` | Drag-to-set volume bar with − and + nudges. |
+| `scripts/generate-disc-art.swift` | Renders the placeholder art printed on each sound's disc (`Assets.xcassets/DiscArt/`). Replace those images to change a disc. |
 | `scripts/generate-noise.py` | Regenerates the seamless noise loops in `MixLayer/Resources/Sounds/`. |
 | `project.yml` | XcodeGen source. Re-generate with `xcodegen generate` if changed. |
 

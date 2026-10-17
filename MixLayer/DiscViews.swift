@@ -24,17 +24,32 @@ enum Haptics {
     }
 }
 
-/// A CD face: iridescent sheen, clear inner ring, and the spindle hole.
+/// A CD face: printed art (or the finish's sheen), clear inner ring, and the spindle hole.
 struct DiscFace: View {
     let finish: DiscFinish
+    var artwork: UIImage? = nil
 
     var body: some View {
         GeometryReader { proxy in
             let size = min(proxy.size.width, proxy.size.height)
 
             ZStack {
-                Circle()
-                    .fill(AngularGradient(colors: finish.sheen, center: .center))
+                if let artwork {
+                    Image(uiImage: artwork)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipShape(Circle())
+
+                    // Keep a hint of the iridescent CD sheen over the print.
+                    Circle()
+                        .fill(AngularGradient(colors: finish.sheen, center: .center))
+                        .opacity(0.28)
+                        .blendMode(.overlay)
+                } else {
+                    Circle()
+                        .fill(AngularGradient(colors: finish.sheen, center: .center))
+                }
 
                 Circle()
                     .fill(
@@ -54,7 +69,8 @@ struct DiscFace: View {
                     .blur(radius: size * 0.006)
 
                 Circle()
-                    .fill(.white.opacity(0.45))
+                    .fill(.white.opacity(artwork == nil ? 0.45 : 0.32))
+                    .background(Circle().fill(.ultraThinMaterial))
                     .frame(width: size * 0.34, height: size * 0.34)
 
                 Circle()
@@ -75,6 +91,7 @@ struct DiscFace: View {
 /// A disc that eases up to speed when playing and spins down when paused.
 struct SpinningDisc: View {
     let finish: DiscFinish
+    var artwork: UIImage? = nil
     let isSpinning: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -83,7 +100,7 @@ struct SpinningDisc: View {
 
     var body: some View {
         TimelineView(.animation(paused: !isAnimating || reduceMotion)) { context in
-            DiscFace(finish: finish)
+            DiscFace(finish: finish, artwork: artwork)
                 .rotationEffect(.degrees(reduceMotion ? 0 : spin.angle(at: context.date)))
         }
         .onAppear {
@@ -183,7 +200,7 @@ struct DiscStage: View {
         let discSize = caseSize * 0.92
 
         ZStack(alignment: .leading) {
-            SpinningDisc(finish: finish, isSpinning: isSpinning)
+            SpinningDisc(finish: finish, artwork: sound?.artwork, isSpinning: isSpinning)
                 .frame(width: discSize, height: discSize)
                 .shadow(color: finish.glow.opacity(isOut ? 0.45 : 0), radius: 24)
                 .offset(x: isOut ? caseSize * 0.6 : caseSize * 0.04)
