@@ -57,7 +57,7 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 
 | Pattern | Current decision |
 |---|---|
-| Built-in sounds | Generated white, pink, and brown noise loops (`scripts/generate-noise.py`); Rain, Forest, Ocean show as "Soon" until sourced |
+| Built-in sounds | Six generated loops: white, pink, brown noise (`scripts/generate-noise.py`) and Rain, Forest, Ocean (`scripts/generate-ambience.py`); a sound with no file shows as "Soon" |
 | Disc art | Each built-in sound prints an image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Placeholders come from `scripts/generate-disc-art.swift`; to use your own, replace the JPG (square, at least 512 px, subject centred because the middle is covered by the hub) and keep the file name, or drop in a PNG and update that imageset's `Contents.json`. A light sheen from the sound's finish is blended over the art so it still reads as a CD. "Soon" discs show their art faded |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
 | Folder import | Removed; picking files is the only import path |

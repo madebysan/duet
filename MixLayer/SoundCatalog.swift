@@ -77,7 +77,7 @@ enum SoundCatalog {
             id: "rain",
             name: "Rain",
             symbol: "cloud.rain.fill",
-            fileName: nil,
+            fileName: "rain",
             finish: DiscFinish(
                 sheen: rgb([(0.52, 0.72, 0.92), (0.22, 0.54, 0.87), (0.80, 0.90, 1.00), (0.52, 0.72, 0.92)]),
                 caseColor: Color(red: 0.09, green: 0.37, blue: 0.65),
@@ -88,7 +88,7 @@ enum SoundCatalog {
             id: "forest",
             name: "Forest",
             symbol: "tree.fill",
-            fileName: nil,
+            fileName: "forest",
             finish: DiscFinish(
                 sheen: rgb([(0.36, 0.79, 0.65), (0.11, 0.62, 0.46), (0.75, 0.93, 0.80), (0.36, 0.79, 0.65)]),
                 caseColor: Color(red: 0.06, green: 0.43, blue: 0.34),
@@ -99,7 +99,7 @@ enum SoundCatalog {
             id: "ocean",
             name: "Ocean",
             symbol: "water.waves",
-            fileName: nil,
+            fileName: "ocean",
             finish: DiscFinish(
                 sheen: rgb([(0.35, 0.70, 0.80), (0.05, 0.27, 0.49), (0.70, 0.90, 0.95), (0.35, 0.70, 0.80)]),
                 caseColor: Color(red: 0.05, green: 0.27, blue: 0.49),
