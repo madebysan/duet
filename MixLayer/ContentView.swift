@@ -245,19 +245,22 @@ private struct SoundShelf: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 18) {
-                ForEach(SoundCatalog.sounds) { sound in
-                    if let track = player.soundTracks.first(where: { $0.soundID == sound.id }) {
-                        Button {
-                            onPick(track)
-                        } label: {
-                            ShelfDisc(sound: sound, isLoaded: currentTrack == track)
+            LazyVStack(alignment: .leading, spacing: 20) {
+                ForEach(SoundCategory.allCases) { category in
+                    let sounds = SoundCatalog.all.filter { $0.category == category && $0.isListed }
+                    if !sounds.isEmpty {
+                        Section {
+                            LazyVGrid(columns: columns, spacing: 18) {
+                                ForEach(sounds) { sound in
+                                    shelfItem(for: sound)
+                                }
+                            }
+                        } header: {
+                            Text(category.title)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(MixTheme.textSecondary)
+                                .accessibilityAddTraits(.isHeader)
                         }
-                        .buttonStyle(PressScaleStyle())
-                        .accessibilityLabel(sound.name)
-                        .accessibilityAddTraits(currentTrack == track ? .isSelected : [])
-                    } else {
-                        ComingSoonDisc(sound: sound)
                     }
                 }
             }
@@ -266,6 +269,22 @@ private struct SoundShelf: View {
             .padding(.bottom, 24)
         }
         .scrollIndicators(.hidden)
+    }
+
+    @ViewBuilder
+    private func shelfItem(for sound: BuiltInSound) -> some View {
+        if let track = player.soundTracks.first(where: { $0.soundID == sound.id }) {
+            Button {
+                onPick(track)
+            } label: {
+                ShelfDisc(sound: sound, isLoaded: currentTrack == track)
+            }
+            .buttonStyle(PressScaleStyle())
+            .accessibilityLabel(sound.name)
+            .accessibilityAddTraits(currentTrack == track ? .isSelected : [])
+        } else {
+            ComingSoonDisc(sound: sound)
+        }
     }
 }
 

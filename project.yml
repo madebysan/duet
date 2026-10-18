@@ -14,10 +14,27 @@ targets:
     platform: iOS
     sources:
       - path: MixLayer
+        excludes:
+          - "PersonalSounds/**"
     resources:
       - path: MixLayer/Resources
+    postCompileScripts:
+      - name: Copy personal sounds
+        basedOnDependencyAnalysis: false
+        script: |
+          # Loops cut from san's own downloads live in a git-ignored folder; bundle them when present.
+          SRC="${SRCROOT}/MixLayer/PersonalSounds"
+          DEST="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalSounds"
+          if [ -d "$SRC" ] && ls "$SRC"/*.m4a >/dev/null 2>&1; then
+            mkdir -p "$DEST"
+            cp -f "$SRC"/*.m4a "$DEST"/
+            echo "Copied $(ls "$SRC"/*.m4a | wc -l | tr -d ' ') personal sounds"
+          else
+            echo "No personal sounds; building without them"
+          fi
     settings:
       base:
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
         PRODUCT_BUNDLE_IDENTIFIER: com.santiagoalonso.mixlayer
         INFOPLIST_FILE: MixLayer/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

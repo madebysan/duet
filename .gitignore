@@ -9,3 +9,6 @@ DerivedData/
 *.xcarchive
 *.xcresult/
 /build-device.log
+
+# Loops cut from san's downloaded recordings: personal device builds only, not licensed to redistribute
+/MixLayer/PersonalSounds/

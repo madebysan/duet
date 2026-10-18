@@ -58,6 +58,8 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | Pattern | Current decision |
 |---|---|
 | Built-in sounds | Six generated loops: white, pink, brown noise (`scripts/generate-noise.py`) and Rain, Forest, Ocean (`scripts/generate-ambience.py`); a sound with no file shows as "Soon" |
+| Personal recordings | Ten loops cut from san's downloaded YouTube references (`~/Downloads/ambient-references`): Steady rain, Porch rain, Rain on leaves, Gentle rain, Woodland, Blackbird, Forest wind, Soft surf, Breakers, Beach. Stored git-ignored in `MixLayer/PersonalSounds/` as 160 kbps AAC (about 2 MB each), copied in by a build step, hidden when absent. Personal device builds only: not licensed for the App Store |
+| Shelf grouping | Sections: Noise, Rain, Forest, Ocean. The generated Rain, Forest, Ocean discs are now named "Synth rain", "Synth forest", "Synth ocean" |
 | Disc art | Each built-in sound prints an image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Placeholders come from `scripts/generate-disc-art.swift`; to use your own, replace the JPG (square, at least 512 px, subject centred because the middle is covered by the hub) and keep the file name, or drop in a PNG and update that imageset's `Contents.json`. A light sheen from the sound's finish is blended over the art so it still reads as a CD. "Soon" discs show their art faded |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
 | Folder import | Removed; picking files is the only import path |

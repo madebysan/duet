@@ -73,7 +73,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     func bootstrapLibrary() async {
         startObservingAudioSession()
         configureAudioSession()
-        soundTracks = SoundCatalog.sounds.compactMap { sound in
+        soundTracks = SoundCatalog.all.compactMap { sound in
             sound.url.map { AudioTrack.builtIn(sound, url: $0) }
         }
         restoreFileURLs()

@@ -10,6 +10,7 @@
 - Fixed play doing nothing on first launch, no resume after interruptions, and swipe-to-delete not working.
 - Added a unit test target for playback logic.
 - Added placeholder art printed on each built-in sound's disc (rain, forest, ocean, and grain textures), replaceable in `Assets.xcassets/DiscArt`.
+- Added ten loops cut from san's downloaded rain, forest, and ocean recordings (personal builds only, git-ignored), and grouped the shelf into Noise, Rain, Forest, Ocean.
 - Built and installed on san's iPhone.
 
 ## 2026-05-28

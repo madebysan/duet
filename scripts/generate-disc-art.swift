@@ -5,7 +5,8 @@
 // deterministic placeholders: replace any of them by dropping a new image into
 // MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/ with the same file name.
 //
-// Usage: swift scripts/generate-disc-art.swift [asset-catalog-folder]
+// Usage: swift scripts/generate-disc-art.swift [asset-catalog-folder] [--force]
+// Existing images are kept unless --force is passed, so hand-replaced art is safe.
 
 import AppKit
 import CoreGraphics
@@ -168,9 +169,8 @@ func ocean(_ ctx: CGContext, _ rng: inout RNG) {
 
 // MARK: - Main
 
-let catalog = URL(fileURLWithPath: CommandLine.arguments.count > 1
-    ? CommandLine.arguments[1]
-    : "MixLayer/Assets.xcassets")
+let positional = CommandLine.arguments.dropFirst().filter { !$0.hasPrefix("--") }
+let catalog = URL(fileURLWithPath: positional.first ?? "MixLayer/Assets.xcassets")
 let folder = catalog.appendingPathComponent("DiscArt", isDirectory: true)
 try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
 try #"{"info":{"author":"xcode","version":1},"properties":{"provides-namespace":false}}"#
@@ -178,8 +178,13 @@ try #"{"info":{"author":"xcode","version":1},"properties":{"provides-namespace":
 
 let designs: [(String, (CGContext, inout RNG) -> Void)] = [
     ("white-noise", whiteNoise), ("pink-noise", pinkNoise), ("brown-noise", brownNoise),
-    ("rain", rain), ("forest", forest), ("ocean", ocean)
+    ("rain", rain), ("forest", forest), ("ocean", ocean),
+    // Personal recordings: same motif per category, different layout per disc.
+    ("steady-rain", rain), ("porch-rain", rain), ("rain-on-leaves", rain), ("gentle-rain", rain),
+    ("woodland", forest), ("blackbird", forest), ("forest-wind", forest),
+    ("soft-surf", ocean), ("breakers", ocean), ("beach", ocean)
 ]
+let force = CommandLine.arguments.contains("--force")
 
 for (index, design) in designs.enumerated() {
     let (id, draw) = design
@@ -188,6 +193,10 @@ for (index, design) in designs.enumerated() {
     draw(ctx, &rng)
 
     let set = folder.appendingPathComponent("disc-\(id).imageset", isDirectory: true)
+    if !force, FileManager.default.fileExists(atPath: set.path) {
+        print("kept \(set.lastPathComponent) (use --force to overwrite)")
+        continue
+    }
     try FileManager.default.createDirectory(at: set, withIntermediateDirectories: true)
     let fileName = "disc-\(id).jpg"
     try save(ctx, to: set.appendingPathComponent(fileName))
