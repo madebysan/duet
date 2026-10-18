@@ -1,44 +1,12 @@
 import Foundation
 
-/// How Your files plays after the current file ends. Sounds always loop one.
-enum PlaybackMode: String, CaseIterable, Identifiable {
-    case loopOne
-    case playAll
-    case shuffle
-
-    var id: String { rawValue }
-
-    var label: String {
-        switch self {
-        case .loopOne: "Loop one"
-        case .playAll: "Play all"
-        case .shuffle: "Shuffle"
-        }
-    }
-}
-
+/// Order of the discs for lock-screen next/previous. Every disc loops on its own, so there is
+/// no play-all or shuffle; next/previous just walks the carousel and wraps at the ends.
 enum PlaybackQueue {
-    /// Index to play after `current` finishes or when skipping forward.
-    /// `playAll` wraps to the start; `shuffle` never repeats the current file when there is a choice.
-    static func nextIndex(
-        after current: Int?,
-        count: Int,
-        mode: PlaybackMode,
-        random: (Range<Int>) -> Int = { Int.random(in: $0) }
-    ) -> Int? {
+    static func nextIndex(after current: Int?, count: Int) -> Int? {
         guard count > 0 else { return nil }
         guard let current, (0..<count).contains(current) else { return 0 }
-
-        switch mode {
-        case .loopOne:
-            return current
-        case .playAll:
-            return (current + 1) % count
-        case .shuffle:
-            guard count > 1 else { return current }
-            let pick = random(0..<(count - 1))
-            return pick >= current ? pick + 1 : pick
-        }
+        return (current + 1) % count
     }
 
     static func previousIndex(before current: Int?, count: Int) -> Int? {
@@ -91,5 +59,24 @@ struct DiscSpin: Equatable {
         guard spinning != isSpinning else { return self }
         let current = angle(at: date).truncatingRemainder(dividingBy: 360)
         return DiscSpin(start: date, baseAngle: current, isSpinning: spinning)
+    }
+}
+
+/// Geometry of the volume ring: a 270° arc that starts at 7:30 and ends at 4:30, clockwise.
+enum VolumeDial {
+    static let sweep = 270.0
+    static let startAngle = -135.0
+
+    /// Percent for a touch at (dx, dy) from the ring's center (y grows downward).
+    /// Angles past either end clamp to 0 or 100.
+    static func percent(dx: Double, dy: Double) -> Int {
+        let angle = atan2(dx, -dy) * 180 / .pi // 0 at 12 o'clock, clockwise positive
+        let clamped = min(max(angle, startAngle), startAngle + sweep)
+        return Int(((clamped - startAngle) / sweep * 100).rounded())
+    }
+
+    /// Angle in degrees from 12 o'clock, clockwise, for a percent.
+    static func angle(forPercent percent: Int) -> Double {
+        startAngle + sweep * Double(min(max(percent, 0), 100)) / 100
     }
 }

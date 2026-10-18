@@ -12,7 +12,7 @@ Reference: Untitled's disc flows on Mobbin (iridescent discs, tactile motion). C
 |---|---:|---|
 | `background` | `#0A0A0A` | Full-screen app background, disc spindle hole |
 | `surface` | `#1A1A1A` | Nudge buttons, Add files, mode pills |
-| `surfaceLight` | `#262626` | Volume bar track |
+| `surfaceLight` | `#262626` | (spare) |
 | `textPrimary` | `#FFFFFF` | Titles, play button fill, selected mode pill |
 | `textSecondary` | `#9E9E9E` | Subtitles, labels |
 | `textTertiary` | `#616161` | "Soon" discs, durations |
@@ -34,16 +34,17 @@ System fonts only, rounded design for display text.
 
 ## Shape Language
 
-Discs are circles with a translucent inner ring and a dark spindle hole, shown bare (no case). Controls are circles (play, nudges) or capsules (mode pills). The volume bar, Add files, and the Your files button use 14 to 16 pt radii.
+Discs are circles with a translucent inner ring and a dark spindle hole, shown bare (no case). Controls are circles (play, nudges, Your files). The volume control is the dial ring. Add files uses a 14 pt radius.
 
 ## Layout
 
-Two screens.
+Two screens. The main screen is the "Dial" direction, picked on 2026-10-18 from three prototypes (archived in `prototypes/history/duet-main-screen/`).
 
-- **Main screen**, top to bottom, with no title bar: the disc carousel, the now playing title with the play button, the volume bar, and a "Your files" button pinned to the bottom (shows the file count and mode). The "Mixing with other apps" status was removed on 2026-10-18; a red line appears at the top only if the audio session fails.
-- **Your files sheet** (medium or large detent, Done to close): Loop one / Play all / Shuffle, Add files, the file list, and "Remove all files". Managing your own audio is a different job from picking a background sound, so it lives here, not on the main screen.
+- **Main screen**, no title bar, top to bottom: category label (uppercase), title (30 pt), status line; the dial; the volume readout ("65%", 44 pt, with "Volume · drag the ring"); then − / play (76 pt) / + at the bottom. A Your files icon button sits top-right. A red status line replaces the normal one only if the audio session fails.
+- **The dial**: a 270° ring (radius 160 pt, 7:30 to 4:30 clockwise) with 28 tick marks around the disc carousel. The ring band (126 to 188 pt from center) is the volume knob: drag along it to set the level, with a selection haptic every 5%. Touches inside the band reach the carousel: swipe to change discs, tap the disc to play or pause.
+- **Your files sheet** (medium or large detent, Done to close): a note that each file is its own disc, Add files, the file list (tap to play, swipe to remove), and "Remove all files" in the ⋯ menu.
 
-The carousel holds every available sound in category order (Noise, Rain, Forest, Ocean), then the "Your mix" disc for your files. The centered disc is 220 pt; neighbours peek in at the sides, scaled to 74% and darkened. One swipe moves one disc. Tapping a side disc scrolls to it; tapping the centered disc plays or pauses. With no files yet, Your mix is an empty dashed disc and the play button becomes "+" to open Your files.
+The carousel holds every available sound in category order (Noise, Rain, Forest, Ocean), then each of your files as its own burned disc, then a dashed "Add files" disc. The centered disc is 236 pt; neighbours peek in at the screen edges, scaled to 65% and darkened. One swipe moves one disc. Centering "Add files" turns the play button into "+".
 
 ## Motion
 
@@ -54,7 +55,7 @@ The carousel holds every available sound in category order (Noise, Rain, Forest,
 | Play | Disc eases up to one turn per 2.6 s over 0.6 s |
 | Pause | Disc spins down over 0.6 s |
 | Play button, discs, Add files | Press scale to 0.92 with a short spring |
-| Volume drag | Selection haptic every 5 percent |
+| Volume ring drag | Selection haptic every 5 percent; arc and knob follow with a 0.15 s snap |
 
 Reduce Motion turns off the spin; the slide still happens. Rotation is a pure function of time (`DiscSpin` in `PlaybackLogic.swift`), so it never drifts or jumps when pausing.
 
@@ -68,8 +69,8 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | Disc art | Each built-in sound prints an image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Placeholders come from `scripts/generate-disc-art.swift`; to use your own, replace the JPG (square, at least 512 px, subject centred because the middle is covered by the hub) and keep the file name, or drop in a PNG and update that imageset's `Contents.json`. A light sheen from the sound's finish is blended over the art so it still reads as a CD. "Soon" discs show their art faded |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
 | Folder import | Removed; picking files is the only import path |
-| Modes | Sounds always loop one. Your files: Loop one, Play all (default), Shuffle |
-| Volume | Wide fill bar, drag to any whole percent; − and + step 1% up to 10%, then 5% |
+| Looping | Every disc loops on its own, built-in or yours; one file plays at a time (san, 2026-10-18). Lock-screen next/previous walks the carousel order |
+| Volume | Drag the dial ring to any whole percent; − and + step 1% up to 10%, then 5% |
 | Long files | Elapsed of total in the subtitle, no scrubber |
 | Metadata | Read once, cached locally by file path, size, and modification date |
 | Removing files | Swipe a row, or "Remove all files" in the ⋯ menu |
@@ -80,9 +81,9 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 |---|---|---|---|---:|
 | `DiscFace` | any `DiscFinish` | square, scales | `MixLayer/DiscViews.swift` | 2 |
 | `SpinningDisc` | spinning, settling, resting | square | `MixLayer/DiscViews.swift` | 1 |
-| `CarouselDisc` | loaded (glow, full size), idle, empty Your mix (dashed, +) | 220 pt | `MixLayer/DiscViews.swift` | 1 |
-| `VolumeBar` | tinted by glow | full width, 48 pt | `MixLayer/VolumeBar.swift` | 1 |
-| `DiscCarousel` | centered, side (scaled, darkened) | 220 pt discs, full width | `MixLayer/ContentView.swift` | 1 |
+| `CarouselDisc` | loaded (glow, full size), idle, Add files (dashed, +) | 236 pt | `MixLayer/DiscViews.swift` | 1 |
+| `VolumeDialView` / `DialRing` | arc tinted by the disc glow, knob, ticks | 320 pt ring | `MixLayer/ContentView.swift` | 1 |
+| `DiscCarousel` | centered, side (scaled, darkened) | 236 pt discs, full width | `MixLayer/ContentView.swift` | 1 |
 | `FilesSheet` | empty state, list | medium/large sheet | `MixLayer/ContentView.swift` | 1 |
 | `FilesPanel` / `FileRow` | empty state, list, current, playing | 44 pt artwork rows | `MixLayer/ContentView.swift` | 1 |
 | `PressScaleStyle` | — | — | `MixLayer/ContentView.swift` | 3 |
@@ -98,6 +99,8 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | 2026-10-18 | Swipeable disc carousel at the top replaces the shelf and tabs; no title or mixing status | Changing discs should feel like flipping through CDs, and the chrome added nothing |
 | 2026-10-18 | Bare CDs, no square cases | The discs carry the identity; the cases added clutter |
 | 2026-10-18 | Your files moves to its own sheet | Managing your own files is a different experience from picking a sound |
+| 2026-10-18 | Main screen uses the Dial direction (ring around the disc is the volume knob) | Picked over Thumb deck and Jukebox in a three-way prototype |
+| 2026-10-18 | One file at a time: every disc loops on its own; Loop one / Play all / Shuffle removed; each file is its own disc | san wants a single sound playing, whether built-in or uploaded |
 | 2026-10-17 | CD library based on Untitled's disc flows | Tactile, memorable, and each sound gets an identity |
 | 2026-10-17 | Drop folder import, keep file picking only | The folder button was unreachable and Google Drive greys out folders anyway |
 | 2026-10-17 | Remember picked files with bookmarks | Re-picking every launch was the biggest friction |

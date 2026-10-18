@@ -6,6 +6,8 @@
 - Removed the "Duet" title and the "Mixing with other apps" status; an error line still appears if audio fails to start.
 - Removed the square cases: the carousel shows bare CDs that lift and glow when loaded.
 - Moved Your files (modes, Add files, list) into its own sheet, opened from a button at the bottom of the main screen.
+- New main screen ("Dial", picked from three prototypes): the disc sits inside a volume ring you drag; big percentage readout; − / play / + at the bottom; Your files as a top-right button.
+- One file at a time: every disc loops on its own, and each uploaded file is its own disc. Removed Loop one / Play all / Shuffle and the single Your mix disc.
 
 ## 2026-10-17
 

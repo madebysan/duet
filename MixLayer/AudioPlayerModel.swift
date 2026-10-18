@@ -30,19 +30,11 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         }
     }
 
-    /// How Your files continues after a file ends. Sounds always loop.
-    @Published var fileMode: PlaybackMode = .playAll {
-        didSet {
-            defaults.set(fileMode.rawValue, forKey: Keys.fileMode)
-            if let currentTrack {
-                player?.numberOfLoops = loops(currentTrack) ? -1 : 0
-            }
-        }
-    }
+    /// Every disc in carousel order: sounds (Noise, Rain, Forest, Ocean), then your files.
+    var discTracks: [AudioTrack] { soundTracks + fileTracks }
 
     private enum Keys {
         static let volume = "volumePercent"
-        static let fileMode = "fileMode"
         static let fileBookmarks = "fileBookmarks"
         static let lastSelection = "lastSelection"
     }
@@ -63,9 +55,6 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         if defaults.object(forKey: Keys.volume) != nil {
             volumePercent = defaults.integer(forKey: Keys.volume)
         }
-        if let raw = defaults.string(forKey: Keys.fileMode), let mode = PlaybackMode(rawValue: raw) {
-            fileMode = mode
-        }
     }
 
     // MARK: - Startup
@@ -73,8 +62,10 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     func bootstrapLibrary() async {
         startObservingAudioSession()
         configureAudioSession()
-        soundTracks = SoundCatalog.all.compactMap { sound in
-            sound.url.map { AudioTrack.builtIn(sound, url: $0) }
+        soundTracks = SoundCategory.allCases.flatMap { category in
+            SoundCatalog.all.filter { $0.category == category }.compactMap { sound in
+                sound.url.map { AudioTrack.builtIn(sound, url: $0) }
+            }
         }
         restoreFileURLs()
         await reloadFileTracks()
@@ -197,7 +188,8 @@ final class AudioPlayerModel: NSObject, ObservableObject {
             let nextPlayer = try AVAudioPlayer(contentsOf: track.url)
             nextPlayer.delegate = self
             nextPlayer.volume = Float(volumePercent) / 100
-            nextPlayer.numberOfLoops = loops(track) ? -1 : 0
+            // Every disc, built-in or yours, loops on its own until you change it.
+            nextPlayer.numberOfLoops = -1
             nextPlayer.prepareToPlay()
             nextPlayer.play()
 
@@ -251,16 +243,14 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     }
 
     func playNext() {
-        let queue = queue(for: currentTrack)
-        let mode: PlaybackMode = currentTrack?.isSound == true ? .playAll : (fileMode == .loopOne ? .playAll : fileMode)
-        let index = PlaybackQueue.nextIndex(after: currentTrack.flatMap { queue.firstIndex(of: $0) }, count: queue.count, mode: mode)
-        if let index {
+        let queue = discTracks
+        if let index = PlaybackQueue.nextIndex(after: currentTrack.flatMap { queue.firstIndex(of: $0) }, count: queue.count) {
             play(track: queue[index])
         }
     }
 
     func playPrevious() {
-        let queue = queue(for: currentTrack)
+        let queue = discTracks
         if let index = PlaybackQueue.previousIndex(before: currentTrack.flatMap { queue.firstIndex(of: $0) }, count: queue.count) {
             play(track: queue[index])
         }
@@ -294,26 +284,11 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
+    /// Discs loop forever, so this only fires if decoding stops early.
     private func trackFinished() {
-        guard let currentTrack, !currentTrack.isSound else { return }
-        let index = PlaybackQueue.nextIndex(
-            after: fileTracks.firstIndex(of: currentTrack),
-            count: fileTracks.count,
-            mode: fileMode
-        )
-        if let index {
-            play(track: fileTracks[index])
-        } else {
-            isPlaying = false
-        }
-    }
-
-    private func loops(_ track: AudioTrack) -> Bool {
-        track.isSound || fileMode == .loopOne
-    }
-
-    private func queue(for track: AudioTrack?) -> [AudioTrack] {
-        track?.source == .file ? fileTracks : soundTracks
+        isPlaying = false
+        stopProgressTimer()
+        updateNowPlayingInfo()
     }
 
     // MARK: - Remembering the last selection

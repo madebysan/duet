@@ -22,28 +22,41 @@ final class PlaybackLogicTests: XCTestCase {
 
     // MARK: Queue
 
-    func testLoopOneRepeatsCurrent() {
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: 2, count: 4, mode: .loopOne), 2)
+    func testNextWrapsToStart() {
+        XCTAssertEqual(PlaybackQueue.nextIndex(after: 1, count: 4), 2)
+        XCTAssertEqual(PlaybackQueue.nextIndex(after: 3, count: 4), 0)
     }
 
-    func testPlayAllWrapsToStart() {
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: 1, count: 4, mode: .playAll), 2)
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: 3, count: 4, mode: .playAll), 0)
-    }
-
-    func testShuffleNeverRepeatsCurrentWhenThereIsAChoice() {
-        for pick in 0..<3 {
-            let next = PlaybackQueue.nextIndex(after: 1, count: 4, mode: .shuffle, random: { _ in pick })
-            XCTAssertNotEqual(next, 1)
-        }
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: 0, count: 1, mode: .shuffle), 0)
+    func testPreviousWrapsToEnd() {
+        XCTAssertEqual(PlaybackQueue.previousIndex(before: 2, count: 4), 1)
+        XCTAssertEqual(PlaybackQueue.previousIndex(before: 0, count: 3), 2)
     }
 
     func testEmptyAndUnknownCurrent() {
-        XCTAssertNil(PlaybackQueue.nextIndex(after: nil, count: 0, mode: .playAll))
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: nil, count: 3, mode: .playAll), 0)
-        XCTAssertEqual(PlaybackQueue.nextIndex(after: 7, count: 3, mode: .shuffle), 0)
-        XCTAssertEqual(PlaybackQueue.previousIndex(before: 0, count: 3), 2)
+        XCTAssertNil(PlaybackQueue.nextIndex(after: nil, count: 0))
+        XCTAssertEqual(PlaybackQueue.nextIndex(after: nil, count: 3), 0)
+        XCTAssertEqual(PlaybackQueue.nextIndex(after: 7, count: 3), 0)
+        XCTAssertNil(PlaybackQueue.previousIndex(before: 1, count: 0))
+    }
+
+    // MARK: Volume dial
+
+    func testDialEndsAndMiddle() {
+        XCTAssertEqual(VolumeDial.percent(dx: 0, dy: -100), 50)      // 12 o'clock
+        XCTAssertEqual(VolumeDial.percent(dx: -70.7, dy: 70.7), 0)   // 7:30
+        XCTAssertEqual(VolumeDial.percent(dx: 70.7, dy: 70.7), 100)  // 4:30
+    }
+
+    func testDialClampsBelowTheGap() {
+        XCTAssertEqual(VolumeDial.percent(dx: -1, dy: 100), 0)
+        XCTAssertEqual(VolumeDial.percent(dx: 1, dy: 100), 100)
+    }
+
+    func testDialAngleRoundTrips() {
+        for p in [0, 1, 25, 65, 100] {
+            let a = VolumeDial.angle(forPercent: p) * .pi / 180
+            XCTAssertEqual(VolumeDial.percent(dx: sin(a) * 100, dy: -cos(a) * 100), p)
+        }
     }
 
     // MARK: Disc spin
