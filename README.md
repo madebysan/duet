@@ -33,6 +33,7 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 | `AudioMetadataCache.swift` | On-device metadata cache so reopening the same files is fast. |
 | `ContentView.swift` | Main screen (header, volume dial around the disc carousel, transport) and the Your files sheet. |
 | `DiscViews.swift` | Disc face, spinning disc, and the carousel disc. |
+| `scripts/crop-disc-art.swift` | Crops a generated top-down vinyl photo to a tight square for `Assets.xcassets/DiscArt`. |
 | `scripts/generate-disc-art.swift` | Renders the placeholder art printed on each sound's disc (`Assets.xcassets/DiscArt/`). Replace those images to change a disc. |
 | `scripts/cut-personal-loops.sh` / `cut-loop.py` | Cuts seamless, level-matched loops from san's downloaded recordings into the git-ignored `MixLayer/PersonalSounds/` (personal builds only). |
 | `scripts/generate-noise.py` | Regenerates the seamless noise loops in `MixLayer/Resources/Sounds/`. |
