@@ -23,6 +23,11 @@ targets:
         basedOnDependencyAnalysis: false
         script: |
           # Loops cut from san's own downloads live in a git-ignored folder; bundle them when present.
+          # Never in Release: these loops aren't licensed for the App Store, TestFlight or anyone else.
+          if [ "${CONFIGURATION}" != "Debug" ]; then
+            echo "Release build; leaving personal sounds out"
+            exit 0
+          fi
           SRC="${SRCROOT}/MixLayer/PersonalSounds"
           DEST="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalSounds"
           if [ -d "$SRC" ] && ls "$SRC"/*.m4a >/dev/null 2>&1; then

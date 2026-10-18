@@ -28,6 +28,7 @@
 		E1E3C15C19F2B5CFF6B578BF /* brown-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = DD96154DABB48DE524A4414D /* brown-noise.wav */; };
 		F2168220C5620C4ADF83E46D /* SoundCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57DFB45F220A9D194ECC3FF /* SoundCatalog.swift */; };
 		F70CDA43F116E39E6D0B9757 /* FLACTagsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */; };
+		FF947C98699412B4C10E1C11 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTagsTests.swift; sourceTree = "<group>"; };
 		450E660448A4459BD014CFF8 /* pink-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "pink-noise.wav"; sourceTree = "<group>"; };
 		507D43B59C98FDCA7F301309 /* DiscViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscViews.swift; sourceTree = "<group>"; };
+		5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		612543094381786A9E1F77D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		61B8B1F71BE57DAD18C865EF /* FLACTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTags.swift; sourceTree = "<group>"; };
 		6AB412417F2E3F0896EA7BB2 /* white-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "white-noise.wav"; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				612543094381786A9E1F77D9 /* Info.plist */,
 				F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */,
 				7ED166D610A332D906861401 /* PlaybackLogic.swift */,
+				5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */,
 				C57DFB45F220A9D194ECC3FF /* SoundCatalog.swift */,
 				77B4113C05BED17D9BC41486 /* Resources */,
 			);
@@ -242,6 +245,7 @@
 			files = (
 				55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */,
 				C7B3AA129961CABD4B32E58F /* CREDITS.md in Resources */,
+				FF947C98699412B4C10E1C11 /* PrivacyInfo.xcprivacy in Resources */,
 				E1E3C15C19F2B5CFF6B578BF /* brown-noise.wav in Resources */,
 				3757BA74875DBA1DF58ED4D5 /* forest.wav in Resources */,
 				389C137718A370F3B4918BBB /* ocean.wav in Resources */,
@@ -271,7 +275,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Loops cut from san's own downloads live in a git-ignored folder; bundle them when present.\nSRC=\"${SRCROOT}/MixLayer/PersonalSounds\"\nDEST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalSounds\"\nif [ -d \"$SRC\" ] && ls \"$SRC\"/*.m4a >/dev/null 2>&1; then\n  mkdir -p \"$DEST\"\n  cp -f \"$SRC\"/*.m4a \"$DEST\"/\n  echo \"Copied $(ls \"$SRC\"/*.m4a | wc -l | tr -d ' ') personal sounds\"\nelse\n  echo \"No personal sounds; building without them\"\nfi\n";
+			shellScript = "# Loops cut from san's own downloads live in a git-ignored folder; bundle them when present.\n# Never in Release: these loops aren't licensed for the App Store, TestFlight or anyone else.\nif [ \"${CONFIGURATION}\" != \"Debug\" ]; then\n  echo \"Release build; leaving personal sounds out\"\n  exit 0\nfi\nSRC=\"${SRCROOT}/MixLayer/PersonalSounds\"\nDEST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalSounds\"\nif [ -d \"$SRC\" ] && ls \"$SRC\"/*.m4a >/dev/null 2>&1; then\n  mkdir -p \"$DEST\"\n  cp -f \"$SRC\"/*.m4a \"$DEST\"/\n  echo \"Copied $(ls \"$SRC\"/*.m4a | wc -l | tr -d ' ') personal sounds\"\nelse\n  echo \"No personal sounds; building without them\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
