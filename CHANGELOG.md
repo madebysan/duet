@@ -9,6 +9,7 @@
 - New main screen ("Dial", picked from three prototypes): the disc sits inside a volume ring you drag; big percentage readout; − / play / + at the bottom; Your files as a top-right button.
 - One file at a time: every disc loops on its own, and each uploaded file is its own disc. Removed Loop one / Play all / Shuffle and the single Your mix disc.
 - Replaced the placeholder disc art with 16 generated vinyl records (Nano Banana Pro via Magnific), one colour story per sound.
+- New app icon: two glowing translucent records (cyan and magenta overlapping into violet) on midnight navy, generated with Nano Banana Pro; all sizes regenerated, README icon re-rounded. Source kept at `artifacts/icon/duet-icon-2026-10-18-source.webp`.
 
 ## 2026-10-17
 
