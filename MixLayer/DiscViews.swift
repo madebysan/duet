@@ -10,7 +10,6 @@ enum MixTheme {
     static let textTertiary = Color(white: 0.38)
     static let accent = Color(red: 0.10, green: 0.65, blue: 1.00)
     static let slide = Animation.spring(response: 0.45, dampingFraction: 0.82)
-    static let tuck = Animation.easeIn(duration: 0.22)
     static let tapSpring = Animation.spring(response: 0.3, dampingFraction: 0.62)
 }
 
@@ -124,91 +123,35 @@ struct SpinningDisc: View {
     }
 }
 
-/// The square case the disc lives in. Sounds get a printed color and symbol; files show artwork.
-struct DiscCase: View {
+/// A bare CD in the carousel: lifts and glows once loaded, spins while playing.
+/// With no track (Your mix before any files are added) it shows an empty dashed disc.
+struct CarouselDisc: View {
     let track: AudioTrack?
-    let sound: BuiltInSound?
-    let finish: DiscFinish
-
-    var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(finish.caseColor)
-
-            if let artwork = track?.artwork {
-                Image(uiImage: artwork)
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            } else if let sound {
-                Image(systemName: sound.symbol)
-                    .font(.system(size: 30, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.92))
-                    .padding(16)
-            } else if track != nil {
-                VStack(alignment: .leading, spacing: 4) {
-                    Image(systemName: "opticaldisc.fill")
-                        .font(.system(size: 24, weight: .semibold))
-                    Text("Your mix")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                }
-                .foregroundStyle(.white.opacity(0.88))
-                .padding(16)
-            } else {
-                Image(systemName: "opticaldisc")
-                    .font(.system(size: 30, weight: .regular))
-                    .foregroundStyle(MixTheme.textTertiary)
-                    .padding(16)
-            }
-
-            // Case hinge and sheen.
-            LinearGradient(
-                colors: [.white.opacity(0.16), .clear, .black.opacity(0.18)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .allowsHitTesting(false)
-
-            Rectangle()
-                .fill(.white.opacity(0.10))
-                .frame(width: 5)
-                .padding(.vertical, 10)
-                .padding(.leading, 9)
-                .frame(maxHeight: .infinity, alignment: .leading)
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(.white.opacity(0.14), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.5), radius: 16, y: 10)
-        .accessibilityHidden(true)
-    }
-}
-
-/// The case with its disc sliding out to the right while a track is loaded.
-struct DiscStage: View {
-    let track: AudioTrack?
-    let isOut: Bool
+    let isLoaded: Bool
     let isSpinning: Bool
-    var caseSize: CGFloat = 136
+    var size: CGFloat = 220
 
     private var sound: BuiltInSound? { SoundCatalog.sound(id: track?.soundID) }
     private var finish: DiscFinish { sound?.finish ?? .burned }
 
     var body: some View {
-        let discSize = caseSize * 0.92
-
-        ZStack(alignment: .leading) {
-            SpinningDisc(finish: finish, artwork: sound?.artwork, isSpinning: isSpinning)
-                .frame(width: discSize, height: discSize)
-                .shadow(color: finish.glow.opacity(isOut ? 0.45 : 0), radius: 24)
-                .offset(x: isOut ? caseSize * 0.6 : caseSize * 0.04)
-
-            DiscCase(track: track, sound: sound, finish: finish)
-                .frame(width: caseSize, height: caseSize)
+        Group {
+            if let track {
+                SpinningDisc(finish: finish, artwork: sound?.artwork ?? track.artwork, isSpinning: isSpinning)
+            } else {
+                Circle()
+                    .strokeBorder(MixTheme.textTertiary, style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
+                    .overlay(
+                        Image(systemName: "plus")
+                            .font(.system(size: 34, weight: .semibold))
+                            .foregroundStyle(MixTheme.textSecondary)
+                    )
+            }
         }
-        .frame(width: caseSize * 1.56, height: caseSize, alignment: .leading)
-        .frame(maxWidth: .infinity)
+        .frame(width: size, height: size)
+        .shadow(color: finish.glow.opacity(isLoaded ? 0.5 : 0), radius: 32)
+        .shadow(color: .black.opacity(track == nil ? 0 : 0.5), radius: 18, y: 12)
+        .scaleEffect(isLoaded ? 1 : 0.94)
+        .accessibilityHidden(true)
     }
 }

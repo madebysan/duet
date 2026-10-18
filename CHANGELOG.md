@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-18
+
+- Replaced the sound shelf and tabs with a swipeable CD carousel at the top: swipe to change discs (keeps playing if playing, loads if paused), tap the centered disc to play or pause, Your mix is the last disc.
+- Removed the "Duet" title and the "Mixing with other apps" status; an error line still appears if audio fails to start.
+- Removed the square cases: the carousel shows bare CDs that lift and glow when loaded.
+- Moved Your files (modes, Add files, list) into its own sheet, opened from a button at the bottom of the main screen.
+
 ## 2026-10-17
 
 - Renamed the app to Duet (home-screen name, in-app header, VoiceOver label, logs). Internal Xcode project, target, and bundle id still use MixLayer.

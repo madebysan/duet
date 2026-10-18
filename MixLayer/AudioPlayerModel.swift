@@ -220,6 +220,21 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         }
     }
 
+    /// Loads a track into the player without starting it (swiping the carousel while paused).
+    func select(track: AudioTrack) {
+        guard track != currentTrack else { return }
+        player?.stop()
+        player = nil
+        isPlaying = false
+        hasStartedPlayback = false
+        currentTrack = track
+        playbackTime = 0
+        playbackDuration = track.duration
+        stopProgressTimer()
+        rememberSelection(track)
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
     func togglePlayback() {
         guard let player else {
             if let track = currentTrack ?? soundTracks.first {

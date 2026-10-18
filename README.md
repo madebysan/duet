@@ -17,7 +17,7 @@ Built for music, loops, and audiobooks while YouTube or another audio app keeps 
 
 Duet uses a mixable `AVAudioSession` so its audio keeps playing when another app starts audio — YouTube, Podcasts, Spotify, anything. iOS normally lets these apps interrupt each other; Duet runs under them.
 
-Everything is on one screen: a big play button, a drag-to-set volume bar, and a CD library. Built-in sounds (white, pink, and brown noise for now) sit on a shelf as discs; tapping one slides it out of its case and it spins while playing. Your own files (from Files, iCloud, or Google Drive) become a "burned" disc, are remembered across launches, and play as Loop one, Play all, or Shuffle.
+Everything is on one screen: a swipeable carousel of CDs at the top, a big play button, a drag-to-set volume bar, and your files. Each built-in sound (noise, rain, forest, ocean) is a bare CD; swipe to change it, and the centered disc glows and spins while playing. Your own files live on a separate Your files screen. Your own files (from Files, iCloud, or Google Drive) become a "burned" disc, are remembered across launches, and play as Loop one, Play all, or Shuffle.
 
 Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 
@@ -31,8 +31,8 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 | `SoundCatalog.swift` | Built-in sounds and their disc finishes (sheen, case color, glow). |
 | `AudioTrack.swift` | `AudioTrack` for a sound or a file; `load()` reads file metadata. |
 | `AudioMetadataCache.swift` | On-device metadata cache so reopening the same files is fast. |
-| `ContentView.swift` | The one screen: header, disc stage, now playing, volume, Sounds shelf, Your files list. |
-| `DiscViews.swift` | Disc face, spinning disc, case, and the slide-out stage. |
+| `ContentView.swift` | Main screen (disc carousel, now playing, volume) and the Your files sheet. |
+| `DiscViews.swift` | Disc face, spinning disc, and the carousel disc. |
 | `VolumeBar.swift` | Drag-to-set volume bar with − and + nudges. |
 | `scripts/generate-disc-art.swift` | Renders the placeholder art printed on each sound's disc (`Assets.xcassets/DiscArt/`). Replace those images to change a disc. |
 | `scripts/cut-personal-loops.sh` / `cut-loop.py` | Cuts seamless, level-matched loops from san's downloaded recordings into the git-ignored `MixLayer/PersonalSounds/` (personal builds only). |

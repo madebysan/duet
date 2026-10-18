@@ -1,45 +1,68 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-enum LibraryTab: String, CaseIterable, Identifiable {
-    case sounds
-    case files
+/// One page of the disc carousel: a built-in sound, or the burned "Your mix" disc for your files.
+enum CarouselItem: Hashable, Identifiable {
+    case sound(String)
+    case yourMix
 
-    var id: String { rawValue }
+    static let yourMixID = "your-mix"
 
-    var label: String {
+    var id: String {
         switch self {
-        case .sounds: "Sounds"
-        case .files: "Your files"
+        case .sound(let id): "sound-\(id)"
+        case .yourMix: Self.yourMixID
         }
+    }
+
+    static func id(for track: AudioTrack?) -> String? {
+        guard let track else { return nil }
+        return track.soundID.map { "sound-\($0)" } ?? yourMixID
     }
 }
 
 struct ContentView: View {
     @EnvironmentObject private var player: AudioPlayerModel
-    @State private var tab: LibraryTab = .sounds
-    @State private var isImportingFiles = false
-    @State private var displayedTrack: AudioTrack?
-    @State private var isDiscOut = false
-    @State private var hasSetInitialTab = false
+    @State private var isShowingFiles = false
+    @State private var centeredID: String?
+    @State private var commitTask: Task<Void, Never>?
+
+    /// Sounds in shelf order (Noise, Rain, Forest, Ocean), then Your mix.
+    private var items: [CarouselItem] {
+        let available = SoundCatalog.all.filter(\.isAvailable)
+        let ordered = SoundCategory.allCases.flatMap { category in available.filter { $0.category == category } }
+        return ordered.map { .sound($0.id) } + [.yourMix]
+    }
+
+    private var isEmptyMixCentered: Bool {
+        centeredID == CarouselItem.yourMixID && player.fileTracks.isEmpty
+    }
 
     private var glow: Color {
-        if let sound = SoundCatalog.sound(id: displayedTrack?.soundID) {
+        let track = player.currentTrack
+        if let sound = SoundCatalog.sound(id: track?.soundID) {
             return sound.finish.glow
         }
-        if let track = displayedTrack, track.artwork != nil {
+        if let track, track.artwork != nil {
             return Color(uiColor: track.accentColor)
         }
-        return displayedTrack == nil ? MixTheme.accent : DiscFinish.burned.glow
+        return track == nil ? MixTheme.accent : DiscFinish.burned.glow
     }
 
     var body: some View {
         VStack(spacing: 16) {
-            header
-                .padding(.horizontal, 20)
+            if let problem = player.audioProblem {
+                Text(problem)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.red.opacity(0.85))
+                    .padding(.horizontal, 20)
+            }
 
-            DiscStage(track: displayedTrack, isOut: isDiscOut, isSpinning: player.isPlaying)
-                .padding(.top, 4)
+            DiscCarousel(
+                items: items,
+                centeredID: $centeredID,
+                onTapCentered: tapCenteredDisc
+            )
 
             nowPlayingRow
                 .padding(.horizontal, 20)
@@ -47,72 +70,46 @@ struct ContentView: View {
             VolumeBar(percent: $player.volumePercent, tint: glow)
                 .padding(.horizontal, 20)
 
-            LibraryTabPicker(selection: $tab)
-                .padding(.horizontal, 20)
+            Spacer(minLength: 12)
 
-            Group {
-                switch tab {
-                case .sounds:
-                    SoundShelf(currentTrack: player.currentTrack) { track in
-                        Haptics.impact(.medium)
-                        player.play(track: track)
-                    }
-                case .files:
-                    FilesPanel(isImportingFiles: $isImportingFiles)
-                }
-            }
-            .frame(maxHeight: .infinity, alignment: .top)
+            yourFilesButton
+                .padding(.horizontal, 20)
+                .padding(.bottom, 8)
         }
-        .padding(.top, 8)
+        .padding(.top, 12)
         .background(background)
         .preferredColorScheme(.dark)
-        .fileImporter(
-            isPresented: $isImportingFiles,
-            allowedContentTypes: [.audio],
-            allowsMultipleSelection: true
-        ) { result in
-            if case .success(let urls) = result {
-                Haptics.impact(.medium)
-                player.importFiles(urls: urls)
-            }
+        .sheet(isPresented: $isShowingFiles) {
+            FilesSheet()
         }
         .onChange(of: player.currentTrack?.id, initial: true) { _, _ in
-            swapDisc(to: player.currentTrack)
+            // Keep the carousel on the loaded disc when playback changes elsewhere
+            // (a file row, lock-screen next/previous, relaunch).
+            guard let id = CarouselItem.id(for: player.currentTrack), id != centeredID else { return }
+            withAnimation(MixTheme.slide) { centeredID = id }
         }
-    }
-
-    private var header: some View {
-        HStack {
-            Text("Duet")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
-                .foregroundStyle(MixTheme.textPrimary)
-
-            Spacer()
-
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(player.audioProblem == nil ? Color.green : Color.red)
-                    .frame(width: 6, height: 6)
-                Text(player.audioProblem ?? "Mixing with other apps")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(MixTheme.textSecondary)
-                    .lineLimit(1)
+        .onChange(of: centeredID) { _, newID in
+            guard let newID, newID != CarouselItem.id(for: player.currentTrack) else { return }
+            Haptics.selection()
+            // Wait for the swipe to settle so passing discs don't each start playing.
+            commitTask?.cancel()
+            commitTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(280))
+                guard !Task.isCancelled else { return }
+                commitSelection(newID)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(MixTheme.surface)
-            .clipShape(Capsule())
         }
     }
 
     private var nowPlayingRow: some View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(player.currentTrack?.title ?? "Pick a sound")
+                Text(isEmptyMixCentered ? "Your mix" : (player.currentTrack?.title ?? "Pick a disc"))
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundStyle(MixTheme.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .contentTransition(.opacity)
 
                 Text(subtitle)
                     .font(.system(size: 13, weight: .medium))
@@ -124,9 +121,13 @@ struct ContentView: View {
 
             Button {
                 Haptics.impact(.heavy)
-                player.togglePlayback()
+                if isEmptyMixCentered {
+                    isShowingFiles = true
+                } else {
+                    player.togglePlayback()
+                }
             } label: {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                Image(systemName: isEmptyMixCentered ? "plus" : (player.isPlaying ? "pause.fill" : "play.fill"))
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(MixTheme.background)
                     .contentTransition(.symbolEffect(.replace))
@@ -134,21 +135,73 @@ struct ContentView: View {
                     .background(Circle().fill(MixTheme.textPrimary))
             }
             .buttonStyle(PressScaleStyle())
-            .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
+            .accessibilityLabel(isEmptyMixCentered ? "Add files" : (player.isPlaying ? "Pause" : "Play"))
         }
     }
 
+    /// Opens Your files, a separate screen for managing your own audio.
+    private var yourFilesButton: some View {
+        Button {
+            Haptics.impact(.light)
+            isShowingFiles = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "opticaldisc")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(MixTheme.textPrimary)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Your files")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(MixTheme.textPrimary)
+                    Text(filesSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(MixTheme.textSecondary)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.up")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(MixTheme.textTertiary)
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 60)
+            .background(MixTheme.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(.white.opacity(0.08), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PressScaleStyle())
+        .accessibilityHint("Opens your own audio files")
+    }
+
+    private var filesSummary: String {
+        let count = player.fileTracks.count
+        if count == 0 { return "Add audio from Files, iCloud, or Google Drive" }
+        return "\(count) \(count == 1 ? "file" : "files") · \(player.fileMode.label)"
+    }
+
     private var subtitle: String {
-        guard let track = player.currentTrack else {
-            return "Choose a disc below"
+        if isEmptyMixCentered {
+            return "Add files to burn your own disc"
         }
 
+        guard let track = player.currentTrack else {
+            return "Swipe to choose a disc"
+        }
+
+        let category = SoundCatalog.sound(id: track.soundID)?.category.title
+
         if !player.isPlaying && !player.hasStartedPlayback {
-            return track.isSound ? "Ready" : "Ready · \(timeString(track.duration))"
+            return track.isSound ? "\(category ?? "Sound") · Ready" : "Ready · \(timeString(track.duration))"
         }
 
         if track.isSound {
-            return player.isPlaying ? "Looping" : "Paused"
+            return "\(category ?? "Sound") · \(player.isPlaying ? "Looping" : "Paused")"
         }
 
         let duration = player.playbackDuration > 0 ? player.playbackDuration : track.duration
@@ -165,30 +218,77 @@ struct ContentView: View {
                 startRadius: 10,
                 endRadius: 460
             )
-            .animation(.easeInOut(duration: 0.6), value: displayedTrack?.id)
+            .animation(.easeInOut(duration: 0.6), value: player.currentTrack?.id)
         }
         .ignoresSafeArea()
     }
 
-    /// Tucks the old disc into its case, swaps the case, then slides the new disc out.
-    private func swapDisc(to track: AudioTrack?) {
-        if !hasSetInitialTab, let track {
-            tab = track.isSound ? .sounds : .files
-            hasSetInitialTab = true
+    /// Loads the centered disc. Keeps playing if something was playing; otherwise just loads it.
+    private func commitSelection(_ id: String) {
+        let track: AudioTrack?
+        if id == CarouselItem.yourMixID {
+            if let current = player.currentTrack, !current.isSound {
+                track = current
+            } else {
+                track = player.fileTracks.first
+            }
+        } else {
+            track = player.soundTracks.first { CarouselItem.id(for: $0) == id }
         }
 
-        guard displayedTrack != nil, isDiscOut else {
-            displayedTrack = track
-            withAnimation(MixTheme.slide) { isDiscOut = track != nil }
-            return
+        guard let track, track != player.currentTrack else { return }
+        if player.isPlaying {
+            player.play(track: track)
+        } else {
+            player.select(track: track)
         }
+    }
 
-        withAnimation(MixTheme.tuck) { isDiscOut = false }
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(240))
-            displayedTrack = player.currentTrack
-            withAnimation(MixTheme.slide) { isDiscOut = displayedTrack != nil }
+    private func tapCenteredDisc() {
+        Haptics.impact(.heavy)
+        if isEmptyMixCentered {
+            isShowingFiles = true
+        } else {
+            player.togglePlayback()
         }
+    }
+}
+
+/// Your files lives on its own screen: managing your own audio is a different job from
+/// picking a background sound.
+private struct FilesSheet: View {
+    @EnvironmentObject private var player: AudioPlayerModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var isImportingFiles = false
+
+    var body: some View {
+        NavigationStack {
+            FilesPanel(isImportingFiles: $isImportingFiles)
+                .padding(.top, 8)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .background(MixTheme.background.ignoresSafeArea())
+                .navigationTitle("Your files")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Done") { dismiss() }
+                            .fontWeight(.semibold)
+                    }
+                }
+        }
+        .fileImporter(
+            isPresented: $isImportingFiles,
+            allowedContentTypes: [.audio],
+            allowsMultipleSelection: true
+        ) { result in
+            if case .success(let urls) = result {
+                Haptics.impact(.medium)
+                player.importFiles(urls: urls)
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.dark)
     }
 }
 
@@ -200,148 +300,95 @@ struct PressScaleStyle: ButtonStyle {
     }
 }
 
-private struct LibraryTabPicker: View {
-    @Binding var selection: LibraryTab
-    @Namespace private var highlight
+// MARK: - Disc carousel
 
-    var body: some View {
-        HStack(spacing: 2) {
-            ForEach(LibraryTab.allCases) { item in
-                Button {
-                    Haptics.selection()
-                    withAnimation(.snappy(duration: 0.25)) { selection = item }
-                } label: {
-                    Text(item.label)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(selection == item ? MixTheme.textPrimary : MixTheme.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 34)
-                        .background {
-                            if selection == item {
-                                Capsule()
-                                    .fill(MixTheme.surfaceLight)
-                                    .matchedGeometryEffect(id: "tab", in: highlight)
-                            }
-                        }
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selection == item ? .isSelected : [])
-            }
-        }
-        .padding(3)
-        .background(MixTheme.surface)
-        .clipShape(Capsule())
-    }
-}
-
-// MARK: - Sounds
-
-private struct SoundShelf: View {
+/// Swipe sideways to change the disc. The centered disc lifts and glows once it's loaded;
+/// neighbours peek in at the sides, smaller and dimmed. Tapping the centered disc plays or pauses.
+private struct DiscCarousel: View {
     @EnvironmentObject private var player: AudioPlayerModel
-    let currentTrack: AudioTrack?
-    let onPick: (AudioTrack) -> Void
+    let items: [CarouselItem]
+    @Binding var centeredID: String?
+    let onTapCentered: () -> Void
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+    private let discSize: CGFloat = 220
+    private var pageWidth: CGFloat { discSize }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
-                ForEach(SoundCategory.allCases) { category in
-                    let sounds = SoundCatalog.all.filter { $0.category == category && $0.isListed }
-                    if !sounds.isEmpty {
-                        Section {
-                            LazyVGrid(columns: columns, spacing: 18) {
-                                ForEach(sounds) { sound in
-                                    shelfItem(for: sound)
-                                }
+        GeometryReader { proxy in
+            ScrollView(.horizontal) {
+                // Negative spacing pulls the shrunken neighbours in so both sides peek.
+                LazyHStack(spacing: -60) {
+                    ForEach(items) { item in
+                        page(for: item)
+                            .frame(width: pageWidth, height: discSize + 24)
+                            .scrollTransition(axis: .horizontal) { content, phase in
+                                content
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.74)
+                                    .brightness(phase.isIdentity ? 0 : -0.32)
+                                    .saturation(phase.isIdentity ? 1 : 0.6)
                             }
-                        } header: {
-                            Text(category.title)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(MixTheme.textSecondary)
-                                .accessibilityAddTraits(.isHeader)
-                        }
+                            .id(item.id)
                     }
                 }
+                .scrollTargetLayout()
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 4)
-            .padding(.bottom, 24)
+            .contentMargins(.horizontal, max((proxy.size.width - pageWidth) / 2, 0), for: .scrollContent)
+            .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
+            .scrollPosition(id: $centeredID, anchor: .center)
+            .scrollIndicators(.hidden)
+            .scrollClipDisabled()
         }
-        .scrollIndicators(.hidden)
+        .frame(height: discSize + 24)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Disc")
+        .accessibilityValue(accessibilityValue)
+        .accessibilityAdjustableAction { direction in
+            guard let index = items.firstIndex(where: { $0.id == centeredID }) else { return }
+            let next = direction == .increment ? index + 1 : index - 1
+            if items.indices.contains(next) {
+                withAnimation(MixTheme.slide) { centeredID = items[next].id }
+            }
+        }
+        .accessibilityAction(named: player.isPlaying ? "Pause" : "Play", onTapCentered)
+    }
+
+    private var accessibilityValue: String {
+        guard let id = centeredID else { return "" }
+        if id == CarouselItem.yourMixID { return "Your mix" }
+        return player.soundTracks.first { CarouselItem.id(for: $0) == id }?.title ?? ""
     }
 
     @ViewBuilder
-    private func shelfItem(for sound: BuiltInSound) -> some View {
-        if let track = player.soundTracks.first(where: { $0.soundID == sound.id }) {
-            Button {
-                onPick(track)
-            } label: {
-                ShelfDisc(sound: sound, isLoaded: currentTrack == track)
+    private func page(for item: CarouselItem) -> some View {
+        let track = track(for: item)
+        let isCentered = centeredID == item.id
+        let isLoaded = isCentered && track != nil && track == player.currentTrack
+
+        CarouselDisc(
+            track: track,
+            isLoaded: isLoaded,
+            isSpinning: isLoaded && player.isPlaying,
+            size: discSize
+        )
+        .animation(MixTheme.slide, value: isLoaded)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if isCentered {
+                onTapCentered()
+            } else {
+                withAnimation(MixTheme.slide) { centeredID = item.id }
             }
-            .buttonStyle(PressScaleStyle())
-            .accessibilityLabel(sound.name)
-            .accessibilityAddTraits(currentTrack == track ? .isSelected : [])
-        } else {
-            ComingSoonDisc(sound: sound)
         }
     }
-}
 
-private struct ShelfDisc: View {
-    let sound: BuiltInSound
-    let isLoaded: Bool
-
-    var body: some View {
-        VStack(spacing: 8) {
-            DiscFace(finish: sound.finish, artwork: sound.artwork)
-                .frame(width: 78, height: 78)
-                .padding(4)
-                .overlay(
-                    Circle().strokeBorder(isLoaded ? sound.finish.glow : .clear, lineWidth: 2)
-                )
-                .shadow(color: sound.finish.glow.opacity(isLoaded ? 0.5 : 0), radius: 12)
-
-            Text(sound.name)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(isLoaded ? MixTheme.textPrimary : MixTheme.textSecondary)
-                .lineLimit(1)
+    private func track(for item: CarouselItem) -> AudioTrack? {
+        switch item {
+        case .sound(let id):
+            return player.soundTracks.first { $0.soundID == id }
+        case .yourMix:
+            if let current = player.currentTrack, !current.isSound { return current }
+            return player.fileTracks.first
         }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-private struct ComingSoonDisc: View {
-    let sound: BuiltInSound
-
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                DiscFace(finish: sound.finish, artwork: sound.artwork)
-                    .saturation(0.2)
-                    .opacity(0.3)
-
-                Circle()
-                    .strokeBorder(MixTheme.textTertiary, style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-
-                Text("Soon")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(MixTheme.textPrimary.opacity(0.8))
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Capsule().fill(MixTheme.background.opacity(0.7)))
-            }
-            .frame(width: 78, height: 78)
-            .padding(4)
-
-            Text(sound.name)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(MixTheme.textTertiary)
-                .lineLimit(1)
-        }
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(sound.name), coming soon")
     }
 }
 
