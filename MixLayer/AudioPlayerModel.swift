@@ -37,6 +37,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         static let volume = "volumePercent"
         static let fileBookmarks = "fileBookmarks"
         static let lastSelection = "lastSelection"
+        static let filePositions = "filePositions"
     }
 
     private let supportedExtensions = Set(["aac", "aif", "aiff", "caf", "flac", "m4a", "m4b", "mp3", "wav"])
@@ -50,8 +51,13 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     private var notificationTokens: [NSObjectProtocol] = []
     private var progressTimer: Timer?
 
+    /// Where each of your files was last left, keyed like `lastSelection` (file name).
+    private var filePositions: [String: Double] = [:]
+    private var ticksSinceSave = 0
+
     override init() {
         super.init()
+        filePositions = defaults.dictionary(forKey: Keys.filePositions) as? [String: Double] ?? [:]
         if defaults.object(forKey: Keys.volume) != nil {
             volumePercent = defaults.integer(forKey: Keys.volume)
         }
@@ -114,6 +120,8 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     }
 
     func removeFile(_ track: AudioTrack) {
+        filePositions[track.url.lastPathComponent] = nil
+        defaults.set(filePositions, forKey: Keys.filePositions)
         let wasCurrent = currentTrack == track
         fileTracks.removeAll { $0 == track }
         fileURLs.removeAll { $0 == track.url }
@@ -181,6 +189,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     // MARK: - Playback
 
     func play(track: AudioTrack) {
+        saveCurrentPosition()
         configureAudioSession()
 
         do {
@@ -191,12 +200,14 @@ final class AudioPlayerModel: NSObject, ObservableObject {
             // Every disc, built-in or yours, loops on its own until you change it.
             nextPlayer.numberOfLoops = -1
             nextPlayer.prepareToPlay()
+            let start = startPosition(for: track, duration: nextPlayer.duration)
+            nextPlayer.currentTime = start
             nextPlayer.play()
 
             player?.stop()
             player = nextPlayer
             currentTrack = track
-            playbackTime = 0
+            playbackTime = start
             playbackDuration = nextPlayer.duration
             isPlaying = true
             hasStartedPlayback = true
@@ -215,12 +226,13 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     /// Loads a track into the player without starting it (swiping the carousel while paused).
     func select(track: AudioTrack) {
         guard track != currentTrack else { return }
+        saveCurrentPosition()
         player?.stop()
         player = nil
         isPlaying = false
         hasStartedPlayback = false
         currentTrack = track
-        playbackTime = 0
+        playbackTime = startPosition(for: track, duration: track.duration)
         playbackDuration = track.duration
         stopProgressTimer()
         rememberSelection(track)
@@ -258,6 +270,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
 
     private func pause() {
         player?.pause()
+        saveCurrentPosition()
         isPlaying = false
         stopProgressTimer()
         updateNowPlayingInfo()
@@ -291,6 +304,35 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         updateNowPlayingInfo()
     }
 
+    // MARK: - Position in your files
+
+    /// Jumps within the current file. Works before playback starts too: the file then starts there.
+    func seek(to time: TimeInterval) {
+        guard let track = currentTrack, !track.isSound else { return }
+        let duration = playbackDuration > 0 ? playbackDuration : track.duration
+        let clamped = min(max(time, 0), max(duration - 0.5, 0))
+        player?.currentTime = clamped
+        playbackTime = clamped
+        filePositions[track.url.lastPathComponent] = clamped
+        defaults.set(filePositions, forKey: Keys.filePositions)
+        updateNowPlayingInfo()
+    }
+
+    /// Saves where the current file is, so coming back to it resumes there. Built-in sounds
+    /// always start fresh.
+    func saveCurrentPosition() {
+        ticksSinceSave = 0
+        guard let track = currentTrack, !track.isSound else { return }
+        let time = player?.currentTime ?? playbackTime
+        filePositions[track.url.lastPathComponent] = time
+        defaults.set(filePositions, forKey: Keys.filePositions)
+    }
+
+    private func startPosition(for track: AudioTrack, duration: TimeInterval) -> TimeInterval {
+        guard !track.isSound else { return 0 }
+        return ResumePosition.start(saved: filePositions[track.url.lastPathComponent], duration: duration)
+    }
+
     // MARK: - Remembering the last selection
 
     private func rememberSelection(_ track: AudioTrack) {
@@ -310,6 +352,9 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         }
         currentTrack = currentTrack ?? soundTracks.first
         playbackDuration = currentTrack?.duration ?? 0
+        if let currentTrack {
+            playbackTime = startPosition(for: currentTrack, duration: playbackDuration)
+        }
     }
 
     // MARK: - Metadata
@@ -466,6 +511,10 @@ final class AudioPlayerModel: NSObject, ObservableObject {
 
                 self.playbackTime = player.currentTime
                 self.playbackDuration = player.duration
+                self.ticksSinceSave += 1
+                if self.ticksSinceSave >= 10 { // every ~5 s
+                    self.saveCurrentPosition()
+                }
             }
         }
     }

@@ -15,6 +15,8 @@
 - Each disc's glow now comes from its own art (Blackbird glows gold, not green); `DiscAccentTests` checks all 16.
 - Your files show their embedded cover art on their disc, with a glow picked from the cover.
 - Added FLAC support, including FLAC titles, artists, albums and covers (`FLACTags.swift`, tested with a fixture).
+- Your files: a slim scrub line under the title to jump anywhere, and each file resumes where you left it.
+- Thinner volume ring with a smaller knob, closer to the disc; removed the Ready / Looping / Paused labels.
 
 ## 2026-10-17
 

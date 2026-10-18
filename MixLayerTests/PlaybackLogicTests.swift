@@ -59,6 +59,19 @@ final class PlaybackLogicTests: XCTestCase {
         }
     }
 
+    // MARK: Resume position
+
+    func testResumesFromSavedPosition() {
+        XCTAssertEqual(ResumePosition.start(saved: 72, duration: 288), 72)
+    }
+
+    func testStartsOverWhenBarelyStartedOrNearlyDone() {
+        XCTAssertEqual(ResumePosition.start(saved: 3, duration: 288), 0)
+        XCTAssertEqual(ResumePosition.start(saved: 285, duration: 288), 0)
+        XCTAssertEqual(ResumePosition.start(saved: nil, duration: 288), 0)
+        XCTAssertEqual(ResumePosition.start(saved: .nan, duration: 288), 0)
+    }
+
     // MARK: Disc spin
 
     func testSpinIsContinuousWhenPausing() {

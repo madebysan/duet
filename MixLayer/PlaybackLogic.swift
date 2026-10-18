@@ -80,3 +80,16 @@ enum VolumeDial {
         startAngle + sweep * Double(min(max(percent, 0), 100)) / 100
     }
 }
+
+/// Where a file starts when you come back to it. Very early and nearly finished positions start
+/// from the top, so a file you barely started (or let reach its end) doesn't resume awkwardly.
+enum ResumePosition {
+    static let minimum: TimeInterval = 5
+    static let tailMargin: TimeInterval = 5
+
+    static func start(saved: TimeInterval?, duration: TimeInterval) -> TimeInterval {
+        guard let saved, saved.isFinite, saved >= minimum else { return 0 }
+        guard duration > 0 else { return saved }
+        return saved < duration - tailMargin ? saved : 0
+    }
+}

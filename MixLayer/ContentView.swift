@@ -55,7 +55,7 @@ struct ContentView: View {
             VolumeDialView(percent: $player.volumePercent, tint: glow) {
                 DiscCarousel(items: items, centeredID: $centeredID, onTapCentered: tapCenteredDisc)
             }
-            .frame(height: 360)
+            .frame(height: 344)
 
             header
                 .padding(.top, 20)
@@ -63,8 +63,23 @@ struct ContentView: View {
                 .contentShape(Rectangle())
                 .highPriorityGesture(swipeGesture(followsFinger: true))
 
+            // Your files get a slim scrub line; the row keeps its height for built-in sounds
+            // so the controls don't jump when you change discs.
+            ScrubLine(
+                time: player.playbackTime,
+                duration: player.playbackDuration > 0 ? player.playbackDuration : (player.currentTrack?.duration ?? 0),
+                tint: glow,
+                onSeek: { player.seek(to: $0) }
+            )
+            .opacity(showsScrubLine ? 1 : 0)
+            .allowsHitTesting(showsScrubLine)
+            .accessibilityHidden(!showsScrubLine)
+            .animation(.easeOut(duration: 0.2), value: showsScrubLine)
+            .padding(.top, 14)
+            .padding(.horizontal, 40)
+
             bottomControls
-                .padding(.top, 40)
+                .padding(.top, 26)
 
             Spacer(minLength: 8)
         }
@@ -143,11 +158,14 @@ struct ContentView: View {
                 .minimumScaleFactor(0.7)
                 .contentTransition(.opacity)
 
-            Text(player.audioProblem ?? status)
-                .font(.system(size: 13, weight: .medium))
-                .monospacedDigit()
-                .foregroundStyle(player.audioProblem == nil ? MixTheme.textSecondary : .red.opacity(0.85))
-                .lineLimit(1)
+            // No Ready/Looping/Paused label: the play button and spinning disc already say it.
+            // This line only appears for an audio problem or the Add files hint.
+            if let note = player.audioProblem ?? (isAddCentered ? "Bring your own audio" : nil) {
+                Text(note)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(player.audioProblem == nil ? MixTheme.textSecondary : .red.opacity(0.85))
+                    .lineLimit(1)
+            }
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine)
@@ -165,17 +183,10 @@ struct ContentView: View {
         return SoundCatalog.sound(id: track.soundID)?.category.title ?? "Your files"
     }
 
-    private var status: String {
-        if isAddCentered { return "Bring your own audio" }
-        guard let track = player.currentTrack, track == displayedTrack else {
-            return player.isPlaying ? "Looping" : "Ready"
-        }
-        if !player.isPlaying {
-            return player.hasStartedPlayback ? "Paused" : "Ready"
-        }
-        if track.isSound { return "Looping" }
-        let duration = player.playbackDuration > 0 ? player.playbackDuration : track.duration
-        return "Looping · \(timeString(player.playbackTime)) of \(timeString(duration))"
+    /// Only for your own files, and only once the centered file is the loaded one.
+    private var showsScrubLine: Bool {
+        guard let track = player.currentTrack, !track.isSound else { return false }
+        return track == displayedTrack && !isAddCentered
     }
 
     private var filesButton: some View {
@@ -298,6 +309,68 @@ struct ContentView: View {
     }
 }
 
+/// Elapsed time, a slim line you can drag to jump anywhere, and the total. The line thickens
+/// while dragging; the jump happens when you let go, so the audio doesn't stutter.
+private struct ScrubLine: View {
+    let time: TimeInterval
+    let duration: TimeInterval
+    let tint: Color
+    let onSeek: (TimeInterval) -> Void
+
+    @State private var dragFraction: Double?
+
+    private var fraction: Double {
+        if let dragFraction { return dragFraction }
+        guard duration > 0 else { return 0 }
+        return min(max(time / duration, 0), 1)
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(timeString(fraction * duration))
+                .frame(width: 44, alignment: .trailing)
+
+            GeometryReader { proxy in
+                let height: CGFloat = dragFraction == nil ? 3 : 7
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.white.opacity(0.14))
+                    Capsule().fill(tint).frame(width: proxy.size.width * fraction)
+                }
+                .frame(height: height)
+                .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            if dragFraction == nil { Haptics.selection() }
+                            withAnimation(.snappy(duration: 0.12)) {
+                                dragFraction = min(max(value.location.x / max(proxy.size.width, 1), 0), 1)
+                            }
+                        }
+                        .onEnded { _ in
+                            if let dragFraction { onSeek(dragFraction * duration) }
+                            withAnimation(.snappy(duration: 0.2)) { dragFraction = nil }
+                        }
+                )
+            }
+            .frame(height: 30)
+
+            Text(timeString(duration))
+                .frame(width: 44, alignment: .leading)
+        }
+        .font(.system(size: 12, weight: .medium))
+        .monospacedDigit()
+        .foregroundStyle(MixTheme.textSecondary)
+        .accessibilityElement()
+        .accessibilityLabel("Position")
+        .accessibilityValue("\(timeString(time)) of \(timeString(duration))")
+        .accessibilityAdjustableAction { direction in
+            let step: TimeInterval = direction == .increment ? 15 : -15
+            onSeek(time + step)
+        }
+    }
+}
+
 struct PressScaleStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -315,44 +388,59 @@ private struct VolumeDialView<Content: View>: View {
     let tint: Color
     @ViewBuilder let content: () -> Content
 
-    private let radius: CGFloat = 160
-    private let bandInner: CGFloat = 126
-    private let bandOuter: CGFloat = 188
+    // Ring sits just outside the 236 pt disc. Only the knob takes touches: a 56 pt circle
+    // around the 13 pt knob. Taps elsewhere on the ring fall through to the disc swipe.
+    private let radius: CGFloat = 140
+    private let handleSize: CGFloat = 56
+    @State private var isDragging = false
 
     var body: some View {
+        let layer = radius * 2 + handleSize
+        let knob = VolumeDial.angle(forPercent: percent) * .pi / 180
+
         ZStack {
             content()
 
-            DialRing(percent: percent, tint: tint, radius: radius)
+            DialRing(percent: percent, tint: tint, radius: radius, isDragging: isDragging)
                 .allowsHitTesting(false)
 
-            Annulus(innerRatio: bandInner / bandOuter)
-                .fill(Color.clear)
-                .contentShape(Annulus(innerRatio: bandInner / bandOuter), eoFill: true)
-                .frame(width: bandOuter * 2, height: bandOuter * 2)
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            let next = VolumeDial.percent(
-                                dx: value.location.x - bandOuter,
-                                dy: value.location.y - bandOuter
-                            )
-                            if next != percent {
-                                if next / 5 != percent / 5 { Haptics.selection() }
-                                percent = next
+            ZStack {
+                Circle()
+                    .fill(Color.clear)
+                    .frame(width: handleSize, height: handleSize)
+                    .contentShape(Circle())
+                    .offset(x: radius * sin(knob), y: -radius * cos(knob))
+                    .gesture(
+                        DragGesture(minimumDistance: 0, coordinateSpace: .named("volumeDial"))
+                            .onChanged { value in
+                                if !isDragging {
+                                    isDragging = true
+                                    Haptics.selection()
+                                }
+                                let next = VolumeDial.percent(
+                                    dx: value.location.x - layer / 2,
+                                    dy: value.location.y - layer / 2
+                                )
+                                if next != percent {
+                                    if next / 5 != percent / 5 { Haptics.selection() }
+                                    percent = next
+                                }
                             }
-                        }
-                )
-                .accessibilityElement()
-                .accessibilityLabel("Volume")
-                .accessibilityValue("\(percent) percent")
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: percent = VolumeStep.stepped(from: percent, up: true)
-                    case .decrement: percent = VolumeStep.stepped(from: percent, up: false)
-                    @unknown default: break
-                    }
+                            .onEnded { _ in isDragging = false }
+                    )
+            }
+            .frame(width: layer, height: layer)
+            .coordinateSpace(name: "volumeDial")
+            .accessibilityElement()
+            .accessibilityLabel("Volume")
+            .accessibilityValue("\(percent) percent")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: percent = VolumeStep.stepped(from: percent, up: true)
+                case .decrement: percent = VolumeStep.stepped(from: percent, up: false)
+                @unknown default: break
                 }
+            }
         }
     }
 }
@@ -361,6 +449,7 @@ private struct DialRing: View {
     let percent: Int
     let tint: Color
     let radius: CGFloat
+    var isDragging = false
 
     var body: some View {
         let fraction = VolumeDial.sweep / 360
@@ -371,44 +460,29 @@ private struct DialRing: View {
                 let tickAngle = VolumeDial.startAngle + Double(k) * 10
                 Capsule()
                     .fill(.white.opacity(tickAngle <= VolumeDial.angle(forPercent: percent) ? 0.55 : 0.14))
-                    .frame(width: 2, height: 6)
-                    .offset(y: -(radius + 17))
+                    .frame(width: 1.5, height: 4)
+                    .offset(y: -(radius + 11))
                     .rotationEffect(.degrees(tickAngle))
             }
 
             Circle()
                 .trim(from: 0, to: fraction)
-                .stroke(.white.opacity(0.1), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                .stroke(.white.opacity(0.1), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                 .rotationEffect(.degrees(135))
 
             Circle()
                 .trim(from: 0, to: fraction * Double(percent) / 100)
-                .stroke(tint, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                .stroke(tint, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                 .rotationEffect(.degrees(135))
 
             Circle()
                 .fill(.white)
-                .frame(width: 22, height: 22)
-                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                .frame(width: isDragging ? 18 : 13, height: isDragging ? 18 : 13)
+                .shadow(color: .black.opacity(0.45), radius: 3, y: 1)
                 .offset(x: radius * sin(knob), y: -radius * cos(knob))
         }
         .frame(width: radius * 2, height: radius * 2)
         .animation(.snappy(duration: 0.15), value: percent)
-    }
-}
-
-/// A ring-shaped hit area: the band between `innerRatio` and the full radius (use with even-odd fill).
-private struct Annulus: Shape {
-    let innerRatio: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let r = min(rect.width, rect.height) / 2
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        path.addEllipse(in: CGRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2))
-        let inner = r * innerRatio
-        path.addEllipse(in: CGRect(x: center.x - inner, y: center.y - inner, width: inner * 2, height: inner * 2))
-        return path
     }
 }
 
