@@ -17,14 +17,8 @@ final class DiscAccentTests: XCTestCase {
         XCTAssertGreaterThan(c.s, 0.5)
     }
 
-    func testWhiteNoiseStaysPale() throws {
-        XCTAssertLessThan(try hueSatBright("white-noise").s, 0.3)
-    }
-
     func testEveryDiscHasABrightGlow() throws {
-        let ids = ["brown-noise", "pink-noise", "white-noise", "rain", "steady-rain", "porch-rain", "rain-on-leaves",
-                   "gentle-rain", "forest", "woodland", "blackbird", "forest-wind", "ocean", "soft-surf", "breakers", "beach"]
-        for id in ids {
+        for id in SoundCatalog.sounds.map(\.id) {
             let c = try hueSatBright(id)
             print(String(format: "GLOW %@ hue %3.0f°  sat %.2f  bright %.2f", id as NSString, c.h, c.s, c.b))
             XCTAssertGreaterThanOrEqual(c.b, 0.85, id)

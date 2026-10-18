@@ -36,8 +36,7 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 | `DiscViews.swift` | Disc face, spinning disc, and the carousel disc. |
 | `scripts/crop-disc-art.swift` | Crops a generated top-down vinyl photo to a tight square for `Assets.xcassets/DiscArt`. |
 | `scripts/generate-disc-art.swift` | Renders placeholder disc art for any sound that doesn't have an image yet; keeps existing images unless `--force`. |
-| `scripts/cut-personal-loops.sh` / `cut-loop.py` | Cuts seamless, level-matched loops from san's downloaded recordings into the git-ignored `MixLayer/PersonalSounds/` (personal builds only). |
-| `scripts/generate-noise.py` | Regenerates the seamless noise loops in `MixLayer/Resources/Sounds/`. |
+| `scripts/cut-personal-loops.sh` / `cut-loop.py` | Cuts seamless, level-matched loops from san's downloaded recordings into the git-ignored `MixLayer/PersonalSounds/` (Debug builds only). `cut-loop.py` also cuts the licensed loops in `MixLayer/Resources/Sounds/`. |
 | `project.yml` | XcodeGen source. Re-generate with `xcodegen generate` if changed. |
 
 ## Agent Onboarding

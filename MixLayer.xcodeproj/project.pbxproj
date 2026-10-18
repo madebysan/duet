@@ -7,25 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		019C1F26F007A5584CC408DE /* rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 889EDE4633F21C6E357DD804 /* rain.wav */; };
-		063A3EFF4D13830882DE7B13 /* pink-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = 450E660448A4459BD014CFF8 /* pink-noise.wav */; };
 		174C9AF3970E389DE63E4B12 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */; };
 		1E19ED569C40C02C5D57D28F /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCAE3E696F830330ED7D710 /* AudioTrack.swift */; };
 		21E87E2758A13BFEE4D123DD /* DiscViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507D43B59C98FDCA7F301309 /* DiscViews.swift */; };
 		2FAF2E4A57D32A7266C8CC6F /* tagged.flac in Resources */ = {isa = PBXBuildFile; fileRef = F9CE5F41941DF01BD1601FEC /* tagged.flac */; };
 		34B4B2B9C32CB54B32AD3C5C /* DiscAccentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB79F91D56A7F88DACD7D746 /* DiscAccentTests.swift */; };
-		3757BA74875DBA1DF58ED4D5 /* forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = CA6AF00E4F5BFA83288AD450 /* forest.wav */; };
-		389C137718A370F3B4918BBB /* ocean.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8EBE4857342E786D821C50CE /* ocean.wav */; };
 		55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10C7EFFECD522436263FB73 /* Assets.xcassets */; };
 		5E4C4061C76181C1A810D496 /* PlaybackLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED166D610A332D906861401 /* PlaybackLogic.swift */; };
 		73DCBB0AD5E225B2468F7992 /* FLACTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B8B1F71BE57DAD18C865EF /* FLACTags.swift */; };
 		99C969146407BEDE345B23FA /* PlaybackLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */; };
-		9F9CE919C35788166B7923B9 /* white-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6AB412417F2E3F0896EA7BB2 /* white-noise.wav */; };
 		AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */; };
 		B004A33DAFA658453B351F93 /* AudioMetadataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57B6372699CE4A803DCFDC2 /* AudioMetadataCache.swift */; };
 		C7B3AA129961CABD4B32E58F /* CREDITS.md in Resources */ = {isa = PBXBuildFile; fileRef = D62047E6C127441C1C6C2926 /* CREDITS.md */; };
 		CAE9815551DBDBAB3EFAD691 /* AudioPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22512484903EBC8456CB17 /* AudioPlayerModel.swift */; };
-		E1E3C15C19F2B5CFF6B578BF /* brown-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = DD96154DABB48DE524A4414D /* brown-noise.wav */; };
 		F2168220C5620C4ADF83E46D /* SoundCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57DFB45F220A9D194ECC3FF /* SoundCatalog.swift */; };
 		F70CDA43F116E39E6D0B9757 /* FLACTagsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */; };
 		FF947C98699412B4C10E1C11 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */; };
@@ -45,24 +39,18 @@
 		1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		20240D3D5D0D618FFD839FCD /* MixLayer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MixLayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTagsTests.swift; sourceTree = "<group>"; };
-		450E660448A4459BD014CFF8 /* pink-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "pink-noise.wav"; sourceTree = "<group>"; };
 		507D43B59C98FDCA7F301309 /* DiscViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscViews.swift; sourceTree = "<group>"; };
 		5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		612543094381786A9E1F77D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		61B8B1F71BE57DAD18C865EF /* FLACTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTags.swift; sourceTree = "<group>"; };
-		6AB412417F2E3F0896EA7BB2 /* white-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "white-noise.wav"; sourceTree = "<group>"; };
 		7ED166D610A332D906861401 /* PlaybackLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackLogic.swift; sourceTree = "<group>"; };
 		86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackLogicTests.swift; sourceTree = "<group>"; };
-		889EDE4633F21C6E357DD804 /* rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rain.wav; sourceTree = "<group>"; };
-		8EBE4857342E786D821C50CE /* ocean.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ocean.wav; sourceTree = "<group>"; };
 		9F3B7EF189A7F64C0FD7E46D /* MixLayerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MixLayerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B10C7EFFECD522436263FB73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B57B6372699CE4A803DCFDC2 /* AudioMetadataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMetadataCache.swift; sourceTree = "<group>"; };
 		C57DFB45F220A9D194ECC3FF /* SoundCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundCatalog.swift; sourceTree = "<group>"; };
-		CA6AF00E4F5BFA83288AD450 /* forest.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = forest.wav; sourceTree = "<group>"; };
 		D62047E6C127441C1C6C2926 /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		DBCAE3E696F830330ED7D710 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
-		DD96154DABB48DE524A4414D /* brown-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "brown-noise.wav"; sourceTree = "<group>"; };
 		DE22512484903EBC8456CB17 /* AudioPlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerModel.swift; sourceTree = "<group>"; };
 		EB79F91D56A7F88DACD7D746 /* DiscAccentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscAccentTests.swift; sourceTree = "<group>"; };
 		F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixLayerApp.swift; sourceTree = "<group>"; };
@@ -130,13 +118,7 @@
 		8D715C8953D472820D743661 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
-				DD96154DABB48DE524A4414D /* brown-noise.wav */,
 				D62047E6C127441C1C6C2926 /* CREDITS.md */,
-				CA6AF00E4F5BFA83288AD450 /* forest.wav */,
-				8EBE4857342E786D821C50CE /* ocean.wav */,
-				450E660448A4459BD014CFF8 /* pink-noise.wav */,
-				889EDE4633F21C6E357DD804 /* rain.wav */,
-				6AB412417F2E3F0896EA7BB2 /* white-noise.wav */,
 			);
 			path = Sounds;
 			sourceTree = "<group>";
@@ -246,12 +228,6 @@
 				55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */,
 				C7B3AA129961CABD4B32E58F /* CREDITS.md in Resources */,
 				FF947C98699412B4C10E1C11 /* PrivacyInfo.xcprivacy in Resources */,
-				E1E3C15C19F2B5CFF6B578BF /* brown-noise.wav in Resources */,
-				3757BA74875DBA1DF58ED4D5 /* forest.wav in Resources */,
-				389C137718A370F3B4918BBB /* ocean.wav in Resources */,
-				063A3EFF4D13830882DE7B13 /* pink-noise.wav in Resources */,
-				019C1F26F007A5584CC408DE /* rain.wav in Resources */,
-				9F9CE919C35788166B7923B9 /* white-noise.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

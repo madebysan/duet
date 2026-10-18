@@ -80,28 +80,6 @@ func save(_ ctx: CGContext, to url: URL) throws {
 
 // MARK: - Designs
 
-func whiteNoise(_ ctx: CGContext, _ rng: inout RNG) {
-    diagonalGradient(ctx, from: color(0xE9ECF2), to: color(0xB9C4D6))
-    blob(ctx, x: 150, y: 380, radius: 260, color(0xFFFFFF, 0.55))
-    blob(ctx, x: 400, y: 120, radius: 220, color(0xA9C3EC, 0.45))
-    grain(ctx, rng: &rng, strength: 70)
-}
-
-func pinkNoise(_ ctx: CGContext, _ rng: inout RNG) {
-    diagonalGradient(ctx, from: color(0xF6B7CF), to: color(0x9C6FD6))
-    blob(ctx, x: 140, y: 400, radius: 240, color(0xFFE0EC, 0.7))
-    blob(ctx, x: 380, y: 180, radius: 260, color(0xD45A8C, 0.55))
-    blob(ctx, x: 300, y: 440, radius: 180, color(0xB89CF2, 0.5))
-    grain(ctx, rng: &rng, strength: 26)
-}
-
-func brownNoise(_ ctx: CGContext, _ rng: inout RNG) {
-    diagonalGradient(ctx, from: color(0xE7A452), to: color(0x4A2610))
-    blob(ctx, x: 170, y: 360, radius: 250, color(0xFFD08A, 0.55))
-    blob(ctx, x: 400, y: 140, radius: 240, color(0x7A3A12, 0.6))
-    grain(ctx, rng: &rng, strength: 34)
-}
-
 func rain(_ ctx: CGContext, _ rng: inout RNG) {
     verticalGradient(ctx, top: color(0x5E86B8), bottom: color(0x0E2440))
     blob(ctx, x: 360, y: 430, radius: 260, color(0xA9C8EE, 0.35))
@@ -177,9 +155,7 @@ try #"{"info":{"author":"xcode","version":1},"properties":{"provides-namespace":
     .write(to: folder.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
 
 let designs: [(String, (CGContext, inout RNG) -> Void)] = [
-    ("white-noise", whiteNoise), ("pink-noise", pinkNoise), ("brown-noise", brownNoise),
-    ("rain", rain), ("forest", forest), ("ocean", ocean),
-    // Personal recordings: same motif per category, different layout per disc.
+    // Same motif per category, different layout per disc.
     ("steady-rain", rain), ("porch-rain", rain), ("rain-on-leaves", rain), ("gentle-rain", rain),
     ("woodland", forest), ("blackbird", forest), ("forest-wind", forest),
     ("soft-surf", ocean), ("breakers", ocean), ("beach", ocean)

@@ -73,7 +73,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         startObservingAudioSession()
         configureAudioSession()
         soundTracks = SoundCategory.allCases.flatMap { category in
-            SoundCatalog.all.filter { $0.category == category }.compactMap { sound in
+            SoundCatalog.sounds.filter { $0.category == category }.compactMap { sound in
                 sound.url.map { AudioTrack.builtIn(sound, url: $0) }
             }
         }

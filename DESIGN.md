@@ -17,7 +17,7 @@ Reference: Untitled's disc flows on Mobbin (iridescent discs, tactile motion). C
 | `textTertiary` | `#616161` | File durations, empty Add files disc |
 | `accent` | `#1AA6FF` | Playing-row waveform, fallback glow |
 
-Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` picks the most vivid colour in the vinyl ring (saturation² × brightness, 24 hue buckets) and lifts it to a bright accent; mostly colourless art like White noise keeps a pale tint. The glow lights the disc, the ring arc, and the background. `DiscFinish.glow` is only the fallback for a sound with no art; `DiscAccentTests` checks every disc. Your files without a cover use the silver `burned` finish; a file with an embedded cover prints it on the disc and takes its glow from it.
+Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` picks the most vivid colour in the vinyl ring (saturation² × brightness, 24 hue buckets) and lifts it to a bright accent; mostly colourless art keeps a pale tint. The glow lights the disc, the ring arc, and the background. `DiscFinish.glow` is only the fallback for a sound with no art; `DiscAccentTests` checks every disc. Your files without a cover use the silver `burned` finish; a file with an embedded cover prints it on the disc and takes its glow from it.
 
 ## Typography
 
@@ -46,7 +46,7 @@ Two screens. The main screen is the "Dial" direction, picked on 2026-10-18 from 
 - **The dial**: a thin 270° ring (radius 140 pt, 2.5 pt line, 13 pt knob, 28 small ticks; 7:30 to 4:30 clockwise) just outside the 236 pt disc. Only the knob takes touches: a 56 pt circle around it (the knob grows to 18 pt while dragging). Drag it around the ring to set the level, with a selection haptic every 5%. Taps or drags anywhere else on the ring fall through to the carousel and the swipe, so the volume can't change by accident.
 - **Your files sheet** (medium or large detent, Done to close): a note that each file is its own disc, Add files, the file list (tap to play, swipe to remove), and "Remove all files" in the ⋯ menu.
 
-The carousel holds every available sound in category order (Noise, Rain, Forest, Ocean), then each of your files as its own burned disc, then a dashed "Add files" disc. The centered disc is 236 pt; neighbours peek in at the screen edges, scaled to 65% and darkened. One swipe moves one disc. Centering "Add files" turns the play button into "+".
+The carousel holds every available sound in category order (Rain, Forest, Ocean), then each of your files as its own burned disc, then a dashed "Add files" disc. The centered disc is 236 pt; neighbours peek in at the screen edges, scaled to 65% and darkened. One swipe moves one disc. Centering "Add files" turns the play button into "+".
 
 ## Motion
 
@@ -65,9 +65,9 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 
 | Pattern | Current decision |
 |---|---|
-| Built-in sounds | Six generated loops: white, pink, brown noise (`scripts/generate-noise.py`) and Rain, Forest, Ocean (`scripts/generate-ambience.py`); a sound with no file shows as "Soon" |
-| Personal recordings | Ten loops cut from san's downloaded YouTube references (`~/Downloads/ambient-references`): Steady rain, Porch rain, Rain on leaves, Gentle rain, Woodland, Blackbird, Forest wind, Soft surf, Breakers, Beach. Stored git-ignored in `MixLayer/PersonalSounds/` as 160 kbps AAC (about 2 MB each), copied in by a build step, hidden when absent. Personal device builds only: not licensed for the App Store |
-| Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it. Selection commits 0.28 s after the swipe settles so passing discs don't each start. The generated Rain, Forest, Ocean discs are named "Synth rain", "Synth forest", "Synth ocean" |
+| Built-in sounds | Ten recorded loops in three groups: Rain (Steady rain, Porch rain, Rain on leaves, Gentle rain), Forest (Woodland, Blackbird, Forest wind), Ocean (Soft surf, Breakers, Beach). A disc with no audio is left out. The generated noise and synth sounds were removed on 2026-10-18 |
+| Where the audio comes from | Shipping audio: a CC0 recording per disc in `MixLayer/Resources/Sounds/<id>.m4a`, sourced in `CREDITS.md` (being found, 2026-10-18). Until then Debug builds use san's personal cuts from YouTube downloads in the git-ignored `MixLayer/PersonalSounds/`; Release builds never include them |
+| Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it. Selection commits 0.28 s after the swipe settles so passing discs don't each start. |
 | Disc art | Each built-in sound prints a generated vinyl image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Made with Nano Banana Pro in the Magnific web app from the prompts in `artifacts/disc-art/prompts.md` (top-down record, plain off-white label at about a third of the diameter, no text), then cropped with `scripts/crop-disc-art.swift`. Each category mixes vinyl techniques (splatter, smoke, marble, rings, colour-in-colour, half-and-half). A light sheen from the sound's finish is blended over the art |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks. Audio already in Duet's own folder (Files › On My iPhone › Duet) is listed automatically, refreshed each time the app opens; removing one hides it (`hiddenFolderFiles`) and picking it again brings it back |
 | File formats | MP3, M4A, M4B, AAC, WAV, AIFF, CAF, and FLAC (added 2026-10-18). FLAC tags and covers come from `FLACTags.swift`, since Apple's metadata API skips them |
