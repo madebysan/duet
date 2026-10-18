@@ -23,6 +23,11 @@ struct ContentView: View {
     @State private var isShowingFiles = false
     @State private var centeredID: String?
     @State private var commitTask: Task<Void, Never>?
+    /// Which disc the name block shows; follows the carousel so the name changes as you swipe.
+    @State private var headerID: String?
+    /// +1 when moving to the next disc, -1 to the previous; picks the slide direction for the name.
+    @State private var swipeDirection = 1
+    @GestureState private var nameDrag: CGFloat = 0
 
     private var items: [CarouselItem] {
         player.discTracks.map { .track($0.id) } + [.addFiles]
@@ -33,7 +38,7 @@ struct ContentView: View {
     private var glow: Color {
         let track = player.currentTrack
         if let sound = SoundCatalog.sound(id: track?.soundID) {
-            return sound.finish.glow
+            return sound.glow
         }
         if let track, track.artwork != nil {
             return Color(uiColor: track.accentColor)
@@ -43,25 +48,32 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-                .padding(.top, 20)
-                .padding(.horizontal, 64)
-
             Spacer(minLength: 8)
 
+            // Dial, then the disc's name, then the controls, centered as one group.
+            // The ring shows the volume, so there's no separate readout.
             VolumeDialView(percent: $player.volumePercent, tint: glow) {
                 DiscCarousel(items: items, centeredID: $centeredID, onTapCentered: tapCenteredDisc)
             }
             .frame(height: 360)
 
-            volumeReadout
-                .padding(.top, 6)
-
-            Spacer(minLength: 8)
+            header
+                .padding(.top, 20)
+                .padding(.horizontal, 40)
+                .contentShape(Rectangle())
+                .highPriorityGesture(swipeGesture(followsFinger: true))
 
             bottomControls
-                .padding(.bottom, 16)
+                .padding(.top, 40)
+
+            Spacer(minLength: 8)
         }
+        // Empty areas of the screen also swipe between discs.
+        .background(
+            Color.clear
+                .contentShape(Rectangle())
+                .gesture(swipeGesture(followsFinger: false))
+        )
         .overlay(alignment: .topTrailing) {
             filesButton
                 .padding(.top, 12)
@@ -78,7 +90,13 @@ struct ContentView: View {
             guard let id, id != centeredID else { return }
             withAnimation(MixTheme.slide) { centeredID = id }
         }
-        .onChange(of: centeredID) { _, newID in
+        .onChange(of: centeredID, initial: true) { oldID, newID in
+            if let oldIndex = items.firstIndex(where: { $0.id == oldID }),
+               let newIndex = items.firstIndex(where: { $0.id == newID }) {
+                swipeDirection = newIndex >= oldIndex ? 1 : -1
+            }
+            withAnimation(.snappy(duration: 0.3)) { headerID = newID }
+
             guard let newID, newID != player.currentTrack?.id else { return }
             Haptics.selection()
             // Wait for the swipe to settle so passing discs don't each start playing.
@@ -93,7 +111,24 @@ struct ContentView: View {
 
     // MARK: Header
 
+    /// The name block for the centered disc. Only one name is visible: on change the old one
+    /// slides out and the next slides in from the swipe direction, clipped to this block.
     private var header: some View {
+        ZStack {
+            nameBlock
+                .id(headerID ?? "none")
+                .transition(.asymmetric(
+                    insertion: .move(edge: swipeDirection > 0 ? .trailing : .leading).combined(with: .opacity),
+                    removal: .move(edge: swipeDirection > 0 ? .leading : .trailing).combined(with: .opacity)
+                ))
+        }
+        .offset(x: nameDrag * 0.5)
+        .opacity(1 - min(abs(nameDrag) / 320, 0.6))
+        .frame(maxWidth: .infinity)
+        .clipped()
+    }
+
+    private var nameBlock: some View {
         VStack(spacing: 6) {
             Text(categoryLabel)
                 .font(.system(size: 12, weight: .semibold))
@@ -101,7 +136,7 @@ struct ContentView: View {
                 .textCase(.uppercase)
                 .foregroundStyle(MixTheme.textSecondary)
 
-            Text(isAddCentered ? "Add files" : (player.currentTrack?.title ?? "Swipe to choose"))
+            Text(isAddCentered ? "Add files" : (displayedTrack?.title ?? "Swipe to choose"))
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(MixTheme.textPrimary)
                 .lineLimit(1)
@@ -118,15 +153,23 @@ struct ContentView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// The centered disc's track, which can lead the player's current track by a moment while a
+    /// swipe settles.
+    private var displayedTrack: AudioTrack? {
+        player.discTracks.first { $0.id == headerID } ?? player.currentTrack
+    }
+
     private var categoryLabel: String {
         if isAddCentered { return "Your files" }
-        guard let track = player.currentTrack else { return " " }
+        guard let track = displayedTrack else { return " " }
         return SoundCatalog.sound(id: track.soundID)?.category.title ?? "Your files"
     }
 
     private var status: String {
         if isAddCentered { return "Bring your own audio" }
-        guard let track = player.currentTrack else { return "Ready" }
+        guard let track = player.currentTrack, track == displayedTrack else {
+            return player.isPlaying ? "Looping" : "Ready"
+        }
         if !player.isPlaying {
             return player.hasStartedPlayback ? "Paused" : "Ready"
         }
@@ -151,22 +194,6 @@ struct ContentView: View {
     }
 
     // MARK: Volume and transport
-
-    private var volumeReadout: some View {
-        VStack(spacing: 2) {
-            Text("\(player.volumePercent)%")
-                .font(.system(size: 44, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(MixTheme.textPrimary)
-                .contentTransition(.numericText(value: Double(player.volumePercent)))
-            Text("Volume · drag the ring")
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(1.2)
-                .textCase(.uppercase)
-                .foregroundStyle(MixTheme.textSecondary)
-        }
-        .accessibilityHidden(true)
-    }
 
     private var bottomControls: some View {
         HStack(spacing: 36) {
@@ -220,6 +247,34 @@ struct ContentView: View {
             .animation(.easeInOut(duration: 0.6), value: player.currentTrack?.id)
         }
         .ignoresSafeArea()
+    }
+
+    // MARK: Swiping
+
+    /// Horizontal swipe that moves one disc. On the name it follows the finger a little first.
+    private func swipeGesture(followsFinger: Bool) -> some Gesture {
+        DragGesture(minimumDistance: 20)
+            .updating($nameDrag) { value, state, _ in
+                guard followsFinger, abs(value.translation.width) > abs(value.translation.height) else { return }
+                state = value.translation.width
+            }
+            .onEnded { value in
+                let dx = value.translation.width, dy = value.translation.height
+                guard abs(dx) > abs(dy) else { return }
+                let projected = value.predictedEndTranslation.width
+                if dx < -50 || projected < -160 {
+                    step(by: 1)
+                } else if dx > 50 || projected > 160 {
+                    step(by: -1)
+                }
+            }
+    }
+
+    private func step(by delta: Int) {
+        guard let index = items.firstIndex(where: { $0.id == centeredID }) else { return }
+        let next = index + delta
+        guard items.indices.contains(next) else { return }
+        withAnimation(MixTheme.slide) { centeredID = items[next].id }
     }
 
     // MARK: Selection

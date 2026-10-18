@@ -18,7 +18,7 @@ Reference: Untitled's disc flows on Mobbin (iridescent discs, tactile motion). C
 | `textTertiary` | `#616161` | "Soon" discs, durations |
 | `accent` | `#1AA6FF` | Playing-row waveform, fallback glow |
 
-Each built-in sound has a `DiscFinish` in `SoundCatalog.swift`: a sheen (colors swept around the disc), a case color (now unused), and a glow. The glow tints the top-of-screen radial light and the volume fill. Your files use the silver `burned` finish; a file with artwork uses its artwork accent instead.
+Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` picks the most vivid colour in the vinyl ring (saturation² × brightness, 24 hue buckets) and lifts it to a bright accent; mostly colourless art like White noise keeps a pale tint. The glow lights the disc, the ring arc, and the background. `DiscFinish.glow` is only the fallback for a sound with no art; `DiscAccentTests` checks every disc. Your files use the silver `burned` finish; a file with artwork uses its artwork accent instead.
 
 ## Typography
 
@@ -40,7 +40,8 @@ Discs are circles with a translucent inner ring and a dark spindle hole, shown b
 
 Two screens. The main screen is the "Dial" direction, picked on 2026-10-18 from three prototypes (archived in `prototypes/history/duet-main-screen/`).
 
-- **Main screen**, no title bar, top to bottom: category label (uppercase), title (30 pt), status line; the dial; the volume readout ("65%", 44 pt, with "Volume · drag the ring"); then − / play (76 pt) / + at the bottom. A Your files icon button sits top-right. A red status line replaces the normal one only if the audio session fails.
+- **Main screen**, no title bar: the dial, the name block (category label, 30 pt title, status line), and − / play (76 pt) / + are stacked and centered vertically as one group. There is no percentage readout: the ring shows the level (VoiceOver still reads it). A Your files icon button sits top-right. A red status line replaces the normal one only if the audio session fails.
+- **Swiping**: a horizontal swipe anywhere on the screen moves one disc (the ring band keeps its own volume drag). On the name it follows the finger a little; the old name slides out and the next slides in from the swipe direction, clipped so only one name is ever visible. The name follows the centered disc immediately; playback switches 0.28 s after the swipe settles.
 - **The dial**: a 270° ring (radius 160 pt, 7:30 to 4:30 clockwise) with 28 tick marks around the disc carousel. The ring band (126 to 188 pt from center) is the volume knob: drag along it to set the level, with a selection haptic every 5%. Touches inside the band reach the carousel: swipe to change discs, tap the disc to play or pause.
 - **Your files sheet** (medium or large detent, Done to close): a note that each file is its own disc, Add files, the file list (tap to play, swipe to remove), and "Remove all files" in the ⋯ menu.
 
@@ -68,6 +69,8 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it ("Ready"). Selection commits 0.28 s after the swipe settles so passing discs don't each start. The generated Rain, Forest, Ocean discs are named "Synth rain", "Synth forest", "Synth ocean" |
 | Disc art | Each built-in sound prints a generated vinyl image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Made with Nano Banana Pro in the Magnific web app from the prompts in `artifacts/disc-art/prompts.md` (top-down record, plain off-white label at about a third of the diameter, no text), then cropped with `scripts/crop-disc-art.swift`. Each category mixes vinyl techniques (splatter, smoke, marble, rings, colour-in-colour, half-and-half). A light sheen from the sound's finish is blended over the art |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
+| File formats | MP3, M4A, M4B, AAC, WAV, AIFF, CAF, and FLAC (added 2026-10-18). FLAC tags and covers come from `FLACTags.swift`, since Apple's metadata API skips them |
+| File covers | A file's embedded cover art is printed on its disc and drives its glow (same `DiscAccent` picker as the built-in discs); files without a cover use the silver burned disc |
 | Folder import | Removed; picking files is the only import path |
 | Looping | Every disc loops on its own, built-in or yours; one file plays at a time (san, 2026-10-18). Lock-screen next/previous walks the carousel order |
 | Volume | Drag the dial ring to any whole percent; − and + step 1% up to 10%, then 5% |
@@ -100,6 +103,8 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | 2026-10-18 | Bare CDs, no square cases | The discs carry the identity; the cases added clutter |
 | 2026-10-18 | Your files moves to its own sheet | Managing your own files is a different experience from picking a sound |
 | 2026-10-18 | Main screen uses the Dial direction (ring around the disc is the volume knob) | Picked over Thumb deck and Jukebox in a three-way prototype |
+| 2026-10-18 | Dial, name, and controls centered as one group; percentage readout removed; swipe anywhere to change disc | The ring already shows the level; a swipe on the name is the most natural way to flip discs |
+| 2026-10-18 | Glow comes from each disc's art (`DiscAccent`), not a per-category colour | Blackbird is black with yellow spots and was glowing green |
 | 2026-10-18 | One file at a time: every disc loops on its own; Loop one / Play all / Shuffle removed; each file is its own disc | san wants a single sound playing, whether built-in or uploaded |
 | 2026-10-17 | CD library based on Untitled's disc flows | Tactile, memorable, and each sound gets an identity |
 | 2026-10-17 | Drop folder import, keep file picking only | The folder button was unreachable and Google Drive greys out folders anyway |

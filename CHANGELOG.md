@@ -10,6 +10,11 @@
 - One file at a time: every disc loops on its own, and each uploaded file is its own disc. Removed Loop one / Play all / Shuffle and the single Your mix disc.
 - Replaced the placeholder disc art with 16 generated vinyl records (Nano Banana Pro via Magnific), one colour story per sound.
 - New app icon: two glowing translucent records (cyan and magenta overlapping into violet) on midnight navy, generated with Nano Banana Pro; all sizes regenerated, README icon re-rounded. Source kept at `artifacts/icon/duet-icon-2026-10-18-source.webp`.
+- Main screen: dial, name, and controls centered as one group; the percentage readout is gone (the ring shows the level).
+- Swipe anywhere, including on the name, to move one disc; the name slides out and the next slides in, so only one is ever visible.
+- Each disc's glow now comes from its own art (Blackbird glows gold, not green); `DiscAccentTests` checks all 16.
+- Your files show their embedded cover art on their disc, with a glow picked from the cover.
+- Added FLAC support, including FLAC titles, artists, albums and covers (`FLACTags.swift`, tested with a fixture).
 
 ## 2026-10-17
 

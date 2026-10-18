@@ -85,7 +85,7 @@ struct AudioTrack: Identifiable, Equatable {
             album: nil,
             duration: 0,
             artwork: nil,
-            accentColor: UIColor(sound.finish.glow),
+            accentColor: UIColor(sound.glow),
             source: .sound,
             soundID: sound.id
         )
@@ -126,7 +126,7 @@ struct AudioTrack: Identifiable, Equatable {
             album: metadata.album?.nilIfBlank,
             duration: metadata.duration,
             artwork: artwork,
-            accentColor: artwork?.averageColor?.saturatedAccent ?? AudioTrack.fallbackAccent(for: titleOverride ?? metadata.title ?? fallbackTitle),
+            accentColor: artwork.flatMap(DiscAccent.vividColor(in:)) ?? artwork?.averageColor?.saturatedAccent ?? AudioTrack.fallbackAccent(for: titleOverride ?? metadata.title ?? fallbackTitle),
             source: source,
             soundID: nil
         )
@@ -165,12 +165,15 @@ struct AudioTrack: Identifiable, Equatable {
         let artwork = await metadataData(for: .commonIdentifierArtwork, in: commonMetadata).flatMap(UIImage.init(data:))
         let duration = CMTimeGetSeconds((try? await asset.load(.duration)) ?? .zero)
 
+        // AVFoundation doesn't read FLAC's Vorbis comments or PICTURE block; read them directly.
+        let flac = url.pathExtension.lowercased() == "flac" ? FLACTags.read(from: url) : nil
+
         return TrackMetadata(
-            title: await metadataString(for: .commonIdentifierTitle, in: commonMetadata),
-            artist: await metadataString(for: .commonIdentifierArtist, in: commonMetadata),
-            album: await metadataString(for: .commonIdentifierAlbumName, in: commonMetadata),
+            title: await metadataString(for: .commonIdentifierTitle, in: commonMetadata) ?? flac?.title,
+            artist: await metadataString(for: .commonIdentifierArtist, in: commonMetadata) ?? flac?.artist,
+            album: await metadataString(for: .commonIdentifierAlbumName, in: commonMetadata) ?? flac?.album,
             duration: duration.isFinite ? duration : 0,
-            artwork: artwork
+            artwork: artwork ?? flac?.picture.flatMap(UIImage.init(data:))
         )
     }
 

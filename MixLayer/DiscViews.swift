@@ -149,7 +149,7 @@ struct CarouselDisc: View {
             }
         }
         .frame(width: size, height: size)
-        .shadow(color: finish.glow.opacity(isLoaded ? 0.5 : 0), radius: 32)
+        .shadow(color: (sound?.glow ?? finish.glow).opacity(isLoaded ? 0.5 : 0), radius: 32)
         .shadow(color: .black.opacity(track == nil ? 0 : 0.5), radius: 18, y: 12)
         .scaleEffect(isLoaded ? 1 : 0.94)
         .accessibilityHidden(true)

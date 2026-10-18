@@ -39,7 +39,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         static let lastSelection = "lastSelection"
     }
 
-    private let supportedExtensions = Set(["aac", "aif", "aiff", "caf", "m4a", "m4b", "mp3", "wav"])
+    private let supportedExtensions = Set(["aac", "aif", "aiff", "caf", "flac", "m4a", "m4b", "mp3", "wav"])
     private let metadataCache = AudioMetadataCache()
     private let defaults = UserDefaults.standard
     private var player: AVAudioPlayer?

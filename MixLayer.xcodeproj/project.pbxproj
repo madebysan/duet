@@ -12,10 +12,13 @@
 		174C9AF3970E389DE63E4B12 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */; };
 		1E19ED569C40C02C5D57D28F /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCAE3E696F830330ED7D710 /* AudioTrack.swift */; };
 		21E87E2758A13BFEE4D123DD /* DiscViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507D43B59C98FDCA7F301309 /* DiscViews.swift */; };
+		2FAF2E4A57D32A7266C8CC6F /* tagged.flac in Resources */ = {isa = PBXBuildFile; fileRef = F9CE5F41941DF01BD1601FEC /* tagged.flac */; };
+		34B4B2B9C32CB54B32AD3C5C /* DiscAccentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB79F91D56A7F88DACD7D746 /* DiscAccentTests.swift */; };
 		3757BA74875DBA1DF58ED4D5 /* forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = CA6AF00E4F5BFA83288AD450 /* forest.wav */; };
 		389C137718A370F3B4918BBB /* ocean.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8EBE4857342E786D821C50CE /* ocean.wav */; };
 		55A0AC26F36626996808ED16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10C7EFFECD522436263FB73 /* Assets.xcassets */; };
 		5E4C4061C76181C1A810D496 /* PlaybackLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED166D610A332D906861401 /* PlaybackLogic.swift */; };
+		73DCBB0AD5E225B2468F7992 /* FLACTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B8B1F71BE57DAD18C865EF /* FLACTags.swift */; };
 		99C969146407BEDE345B23FA /* PlaybackLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */; };
 		9F9CE919C35788166B7923B9 /* white-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6AB412417F2E3F0896EA7BB2 /* white-noise.wav */; };
 		AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */; };
@@ -24,6 +27,7 @@
 		CAE9815551DBDBAB3EFAD691 /* AudioPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22512484903EBC8456CB17 /* AudioPlayerModel.swift */; };
 		E1E3C15C19F2B5CFF6B578BF /* brown-noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = DD96154DABB48DE524A4414D /* brown-noise.wav */; };
 		F2168220C5620C4ADF83E46D /* SoundCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57DFB45F220A9D194ECC3FF /* SoundCatalog.swift */; };
+		F70CDA43F116E39E6D0B9757 /* FLACTagsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,9 +43,11 @@
 /* Begin PBXFileReference section */
 		1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		20240D3D5D0D618FFD839FCD /* MixLayer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MixLayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTagsTests.swift; sourceTree = "<group>"; };
 		450E660448A4459BD014CFF8 /* pink-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "pink-noise.wav"; sourceTree = "<group>"; };
 		507D43B59C98FDCA7F301309 /* DiscViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscViews.swift; sourceTree = "<group>"; };
 		612543094381786A9E1F77D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		61B8B1F71BE57DAD18C865EF /* FLACTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTags.swift; sourceTree = "<group>"; };
 		6AB412417F2E3F0896EA7BB2 /* white-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "white-noise.wav"; sourceTree = "<group>"; };
 		7ED166D610A332D906861401 /* PlaybackLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackLogic.swift; sourceTree = "<group>"; };
 		86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackLogicTests.swift; sourceTree = "<group>"; };
@@ -56,7 +62,9 @@
 		DBCAE3E696F830330ED7D710 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		DD96154DABB48DE524A4414D /* brown-noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "brown-noise.wav"; sourceTree = "<group>"; };
 		DE22512484903EBC8456CB17 /* AudioPlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerModel.swift; sourceTree = "<group>"; };
+		EB79F91D56A7F88DACD7D746 /* DiscAccentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscAccentTests.swift; sourceTree = "<group>"; };
 		F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixLayerApp.swift; sourceTree = "<group>"; };
+		F9CE5F41941DF01BD1601FEC /* tagged.flac */ = {isa = PBXFileReference; path = tagged.flac; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -69,6 +77,7 @@
 				DBCAE3E696F830330ED7D710 /* AudioTrack.swift */,
 				1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */,
 				507D43B59C98FDCA7F301309 /* DiscViews.swift */,
+				61B8B1F71BE57DAD18C865EF /* FLACTags.swift */,
 				612543094381786A9E1F77D9 /* Info.plist */,
 				F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */,
 				7ED166D610A332D906861401 /* PlaybackLogic.swift */,
@@ -81,6 +90,8 @@
 		713C30F3025C7AB05C145CE0 /* MixLayerTests */ = {
 			isa = PBXGroup;
 			children = (
+				EB79F91D56A7F88DACD7D746 /* DiscAccentTests.swift */,
+				209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */,
 				86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */,
 			);
 			path = MixLayerTests;
@@ -97,6 +108,7 @@
 		7C317FEF709E8CE96CD41046 = {
 			isa = PBXGroup;
 			children = (
+				EA3B7FDBE7F35BF3EB01A6F7 /* Fixtures */,
 				080D75BA80A46EAAF4B3DA08 /* MixLayer */,
 				713C30F3025C7AB05C145CE0 /* MixLayerTests */,
 				8236FBA5C3C28D91FE71E2AD /* Products */,
@@ -126,6 +138,15 @@
 			path = Sounds;
 			sourceTree = "<group>";
 		};
+		EA3B7FDBE7F35BF3EB01A6F7 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				F9CE5F41941DF01BD1601FEC /* tagged.flac */,
+			);
+			name = Fixtures;
+			path = MixLayerTests/Fixtures;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -134,6 +155,7 @@
 			buildConfigurationList = AD48BE327BC4A180FF1FF6C3 /* Build configuration list for PBXNativeTarget "MixLayerTests" */;
 			buildPhases = (
 				05C3D1B36AE187C4BBFBE656 /* Sources */,
+				1888CA4EFCC91FA367995F39 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -206,6 +228,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1888CA4EFCC91FA367995F39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2FAF2E4A57D32A7266C8CC6F /* tagged.flac in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		42F251145199AAFEC375E7C3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -250,6 +280,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34B4B2B9C32CB54B32AD3C5C /* DiscAccentTests.swift in Sources */,
+				F70CDA43F116E39E6D0B9757 /* FLACTagsTests.swift in Sources */,
 				99C969146407BEDE345B23FA /* PlaybackLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -263,6 +295,7 @@
 				1E19ED569C40C02C5D57D28F /* AudioTrack.swift in Sources */,
 				174C9AF3970E389DE63E4B12 /* ContentView.swift in Sources */,
 				21E87E2758A13BFEE4D123DD /* DiscViews.swift in Sources */,
+				73DCBB0AD5E225B2468F7992 /* FLACTags.swift in Sources */,
 				AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */,
 				5E4C4061C76181C1A810D496 /* PlaybackLogic.swift in Sources */,
 				F2168220C5620C4ADF83E46D /* SoundCatalog.swift in Sources */,
