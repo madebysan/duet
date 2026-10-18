@@ -11,14 +11,13 @@ Reference: Untitled's disc flows on Mobbin (iridescent discs, tactile motion). C
 | Token | Value | Use |
 |---|---:|---|
 | `background` | `#0A0A0A` | Full-screen app background, disc spindle hole |
-| `surface` | `#1A1A1A` | Nudge buttons, Add files, mode pills |
-| `surfaceLight` | `#262626` | (spare) |
-| `textPrimary` | `#FFFFFF` | Titles, play button fill, selected mode pill |
-| `textSecondary` | `#9E9E9E` | Subtitles, labels |
-| `textTertiary` | `#616161` | "Soon" discs, durations |
+| `surface` | `#1A1A1A` | Nudge buttons, Your files button, Add files, file rows |
+| `textPrimary` | `#FFFFFF` | Titles, play button fill, volume knob |
+| `textSecondary` | `#9E9E9E` | Category label, scrub times, file details |
+| `textTertiary` | `#616161` | File durations, empty Add files disc |
 | `accent` | `#1AA6FF` | Playing-row waveform, fallback glow |
 
-Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` picks the most vivid colour in the vinyl ring (saturation² × brightness, 24 hue buckets) and lifts it to a bright accent; mostly colourless art like White noise keeps a pale tint. The glow lights the disc, the ring arc, and the background. `DiscFinish.glow` is only the fallback for a sound with no art; `DiscAccentTests` checks every disc. Your files use the silver `burned` finish; a file with artwork uses its artwork accent instead.
+Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` picks the most vivid colour in the vinyl ring (saturation² × brightness, 24 hue buckets) and lifts it to a bright accent; mostly colourless art like White noise keeps a pale tint. The glow lights the disc, the ring arc, and the background. `DiscFinish.glow` is only the fallback for a sound with no art; `DiscAccentTests` checks every disc. Your files without a cover use the silver `burned` finish; a file with an embedded cover prints it on the disc and takes its glow from it.
 
 ## Typography
 
@@ -26,11 +25,11 @@ System fonts only, rounded design for display text.
 
 | Role | Style |
 |---|---|
-| App title | 24 pt, bold, rounded |
-| Now playing title | 22 pt, bold, rounded |
-| Volume percent | 17 pt, bold, rounded, monospaced digits |
-| Section label, mode pills | 13 pt, semibold |
-| Subtitles, status | 12 to 13 pt, medium |
+| Disc title | 30 pt, bold, rounded (scales down to 70% before truncating) |
+| Category label | 12 pt, semibold, uppercase, 1.2 tracking |
+| Scrub times | 12 pt, medium, monospaced digits |
+| Audio problem / Add files hint | 13 pt, medium |
+| Your files sheet rows | 15 pt semibold title, 12 pt details |
 
 ## Shape Language
 
@@ -68,9 +67,9 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 |---|---|
 | Built-in sounds | Six generated loops: white, pink, brown noise (`scripts/generate-noise.py`) and Rain, Forest, Ocean (`scripts/generate-ambience.py`); a sound with no file shows as "Soon" |
 | Personal recordings | Ten loops cut from san's downloaded YouTube references (`~/Downloads/ambient-references`): Steady rain, Porch rain, Rain on leaves, Gentle rain, Woodland, Blackbird, Forest wind, Soft surf, Breakers, Beach. Stored git-ignored in `MixLayer/PersonalSounds/` as 160 kbps AAC (about 2 MB each), copied in by a build step, hidden when absent. Personal device builds only: not licensed for the App Store |
-| Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it ("Ready"). Selection commits 0.28 s after the swipe settles so passing discs don't each start. The generated Rain, Forest, Ocean discs are named "Synth rain", "Synth forest", "Synth ocean" |
+| Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it. Selection commits 0.28 s after the swipe settles so passing discs don't each start. The generated Rain, Forest, Ocean discs are named "Synth rain", "Synth forest", "Synth ocean" |
 | Disc art | Each built-in sound prints a generated vinyl image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Made with Nano Banana Pro in the Magnific web app from the prompts in `artifacts/disc-art/prompts.md` (top-down record, plain off-white label at about a third of the diameter, no text), then cropped with `scripts/crop-disc-art.swift`. Each category mixes vinyl techniques (splatter, smoke, marble, rings, colour-in-colour, half-and-half). A light sheen from the sound's finish is blended over the art |
-| Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks |
+| Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks. Audio already in Duet's own folder (Files › On My iPhone › Duet) is listed automatically, refreshed each time the app opens; removing one hides it (`hiddenFolderFiles`) and picking it again brings it back |
 | File formats | MP3, M4A, M4B, AAC, WAV, AIFF, CAF, and FLAC (added 2026-10-18). FLAC tags and covers come from `FLACTags.swift`, since Apple's metadata API skips them |
 | File covers | A file's embedded cover art is printed on its disc and drives its glow (same `DiscAccent` picker as the built-in discs); files without a cover use the silver burned disc |
 | Folder import | Removed; picking files is the only import path |

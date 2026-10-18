@@ -38,6 +38,7 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         static let fileBookmarks = "fileBookmarks"
         static let lastSelection = "lastSelection"
         static let filePositions = "filePositions"
+        static let hiddenFolderFiles = "hiddenFolderFiles"
     }
 
     private let supportedExtensions = Set(["aac", "aif", "aiff", "caf", "flac", "m4a", "m4b", "mp3", "wav"])
@@ -54,10 +55,13 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     /// Where each of your files was last left, keyed like `lastSelection` (file name).
     private var filePositions: [String: Double] = [:]
     private var ticksSinceSave = 0
+    /// Audio files in Duet's own folder (On My iPhone › Duet) that you removed from the list.
+    private var hiddenFolderFiles: Set<String> = []
 
     override init() {
         super.init()
         filePositions = defaults.dictionary(forKey: Keys.filePositions) as? [String: Double] ?? [:]
+        hiddenFolderFiles = Set(defaults.stringArray(forKey: Keys.hiddenFolderFiles) ?? [])
         if defaults.object(forKey: Keys.volume) != nil {
             volumePercent = defaults.integer(forKey: Keys.volume)
         }
@@ -111,6 +115,10 @@ final class AudioPlayerModel: NSObject, ObservableObject {
         }
 
         fileImportProblem = nil
+        for url in added where isInDuetFolder(url) {
+            hiddenFolderFiles.remove(url.lastPathComponent)
+        }
+        saveHiddenFolderFiles()
         fileURLs.append(contentsOf: added)
         saveFileBookmarks()
 
@@ -122,6 +130,10 @@ final class AudioPlayerModel: NSObject, ObservableObject {
     func removeFile(_ track: AudioTrack) {
         filePositions[track.url.lastPathComponent] = nil
         defaults.set(filePositions, forKey: Keys.filePositions)
+        if isInDuetFolder(track.url) {
+            hiddenFolderFiles.insert(track.url.lastPathComponent)
+            saveHiddenFolderFiles()
+        }
         let wasCurrent = currentTrack == track
         fileTracks.removeAll { $0 == track }
         fileURLs.removeAll { $0 == track.url }
@@ -143,18 +155,56 @@ final class AudioPlayerModel: NSObject, ObservableObject {
             url.stopAccessingSecurityScopedResource()
         }
         securityScopedURLs = []
+        for track in fileTracks where isInDuetFolder(track.url) {
+            hiddenFolderFiles.insert(track.url.lastPathComponent)
+        }
+        saveHiddenFolderFiles()
         fileURLs = []
         fileTracks = []
         saveFileBookmarks()
     }
 
+    /// Re-reads your files, including anything dropped into Duet's folder since the last look.
+    func refreshFiles() {
+        Task { await reloadFileTracks() }
+    }
+
     private func reloadFileTracks() async {
         isLoadingFiles = true
-        let references = fileURLs
+        var seen = Set<String>()
+        let urls = (fileURLs + folderFileURLs()).filter {
+            seen.insert($0.resolvingSymlinksInPath().path).inserted
+        }
+        let references = urls
             .compactMap(audioFileReference(for:))
             .sorted { $0.url.lastPathComponent.localizedStandardCompare($1.url.lastPathComponent) == .orderedAscending }
         fileTracks = await loadTracks(from: references)
         isLoadingFiles = false
+    }
+
+    // MARK: Duet's own folder
+
+    /// On My iPhone › Duet. Audio files placed here (Files app, Finder, AirDrop "Save to Files")
+    /// show up in Your files without picking them.
+    private var duetFolder: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+
+    private func folderFileURLs() -> [URL] {
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: duetFolder, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles]
+        )) ?? []
+        return contents.filter {
+            supportedExtensions.contains($0.pathExtension.lowercased()) && !hiddenFolderFiles.contains($0.lastPathComponent)
+        }
+    }
+
+    private func isInDuetFolder(_ url: URL) -> Bool {
+        url.resolvingSymlinksInPath().deletingLastPathComponent().path == duetFolder.resolvingSymlinksInPath().path
+    }
+
+    private func saveHiddenFolderFiles() {
+        defaults.set(Array(hiddenFolderFiles).sorted(), forKey: Keys.hiddenFolderFiles)
     }
 
     private func saveFileBookmarks() {

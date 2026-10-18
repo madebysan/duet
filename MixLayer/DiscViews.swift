@@ -4,7 +4,6 @@ import UIKit
 enum MixTheme {
     static let background = Color(red: 0.04, green: 0.04, blue: 0.04)
     static let surface = Color(red: 0.10, green: 0.10, blue: 0.10)
-    static let surfaceLight = Color(red: 0.15, green: 0.15, blue: 0.15)
     static let textPrimary = Color.white
     static let textSecondary = Color(white: 0.62)
     static let textTertiary = Color(white: 0.38)

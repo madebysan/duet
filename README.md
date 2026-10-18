@@ -5,7 +5,7 @@
 <p>Play local audio quietly under another iPhone app.<br>
 Built for music, loops, and audiobooks while YouTube or another audio app keeps playing.</p>
 
-<p><strong>Version 0.1.0</strong> · iOS 17+ · personal device build</p>
+<p><strong>Version 0.1</strong> · iOS 17+ · personal device build</p>
 
 <p>
   <img src="https://img.shields.io/badge/Swift-f05138" alt="Swift">
@@ -28,8 +28,9 @@ Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
 | `MixLayerApp.swift` | App entry point. Creates `AudioPlayerModel`, boots the library on launch, supports `--autoplay-sample` for QA (plays the first sound). |
 | `AudioPlayerModel.swift` | Core model: mixable audio session, built-in sounds, your files with bookmarks, looping, volume, interruptions, lock-screen controls. |
 | `PlaybackLogic.swift` | Pure, unit-tested logic: disc order for next/previous, volume stepping, dial geometry, disc spin math. |
-| `SoundCatalog.swift` | Built-in sounds, their categories, and their disc finishes (sheen, glow). |
-| `AudioTrack.swift` | `AudioTrack` for a sound or a file; `load()` reads file metadata. |
+| `SoundCatalog.swift` | Built-in sounds, their categories, disc finishes, and `DiscAccent` (glow colour picked from each disc's art). |
+| `AudioTrack.swift` | `AudioTrack` for a sound or a file; `load()` reads file metadata and covers. |
+| `FLACTags.swift` | Reads FLAC titles, artists, albums and covers, which Apple's metadata API skips. |
 | `AudioMetadataCache.swift` | On-device metadata cache so reopening the same files is fast. |
 | `ContentView.swift` | Main screen (header, volume dial around the disc carousel, transport) and the Your files sheet. |
 | `DiscViews.swift` | Disc face, spinning disc, and the carousel disc. |

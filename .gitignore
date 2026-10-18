@@ -12,3 +12,8 @@ DerivedData/
 
 # Loops cut from san's downloaded recordings: personal device builds only, not licensed to redistribute
 /MixLayer/PersonalSounds/
+
+# Local cleanup archive (never committed)
+/_archived/
+# Claude Code local config and worktrees
+/.claude/

@@ -12,6 +12,8 @@ struct MixLayerApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     // Keep each file's place even if the app is closed from the background.
                     if phase != .active { player.saveCurrentPosition() }
+                    // Pick up files dropped into Duet's folder while the app was away.
+                    if phase == .active { player.refreshFiles() }
                 }
                 .task {
                     await player.bootstrapLibrary()
