@@ -10,9 +10,6 @@ DerivedData/
 *.xcresult/
 /build-device.log
 
-# Loops cut from san's downloaded recordings: personal device builds only, not licensed to redistribute
-/MixLayer/PersonalSounds/
-
 # Local cleanup archive (never committed)
 /_archived/
 # Claude Code local config and worktrees
@@ -22,11 +19,6 @@ DerivedData/
 fastlane/.env
 fastlane/report.xml
 fastlane/README.md
-
-# Duet video render output and third-party preview audio
-/video/out/
-/video/review/
-/video/track-previews/
 
 # Fastlane test run output
 fastlane/test_output/

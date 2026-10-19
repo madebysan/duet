@@ -44,11 +44,9 @@ struct BuiltInSound: Identifiable, Equatable {
     /// Art printed on the disc: `disc-<id>` in Assets.xcassets/DiscArt. Replace the image there to change it.
     var artwork: UIImage? { UIImage(named: "disc-\(id)") }
 
-    /// A licensed copy bundled from `Resources/Sounds/<id>.m4a` wins. Otherwise Debug builds fall
-    /// back to san's personal cut in the git-ignored `PersonalSounds/` folder (never in Release).
+    /// The loop bundled from `Resources/Sounds/<id>.m4a`.
     var url: URL? {
         Bundle.main.url(forResource: id, withExtension: "m4a")
-            ?? Bundle.main.url(forResource: id, withExtension: "m4a", subdirectory: "PersonalSounds")
     }
 }
 

@@ -46,7 +46,6 @@ xcodebuild -project MixLayer.xcodeproj -scheme MixLayer -destination 'platform=i
 |---|---|
 | `scripts/cut-cc0-loops.sh` | Downloads nothing itself; cuts the shipped loops (up to 10 minutes each, 3 s crossfade at the seam, levelled to about -21 dBFS) from the CC0 Freesound recordings listed in `CREDITS.md`. |
 | `scripts/cut-loop.py` | The loop cutter the shell scripts call: finds a quiet seam, crossfades, levels, writes AAC. |
-| `scripts/cut-personal-loops.sh` | Cuts loops from your own recordings into `MixLayer/PersonalSounds/`, which is git-ignored and bundled by Debug builds only. Release builds never include it, and the Fastlane build lane fails if a file from it reaches the IPA. |
 | `scripts/crop-disc-art.swift` | Crops a generated top-down vinyl image to a tight square for `Assets.xcassets/DiscArt`. |
 | `scripts/generate-disc-art.swift` | Renders placeholder disc art for any sound that has no image yet; keeps existing images unless `--force`. |
 

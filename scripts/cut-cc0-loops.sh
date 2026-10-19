@@ -1,7 +1,7 @@
 #!/bin/bash
 # Cuts Duet's shipping loops from CC0 Freesound recordings (sources in MixLayer/Resources/Sounds/CREDITS.md).
 # Each loop is up to 10 minutes: the whole recording when shorter, minus a few seconds at each end for the seam.
-# Output: MixLayer/Resources/Sounds/<disc>.m4a, 128 kbps AAC, level-matched to the personal loops (-21 dBFS RMS).
+# Output: MixLayer/Resources/Sounds/<disc>.m4a, 128 kbps AAC, level-matched across discs (-21 dBFS RMS).
 #
 # Usage: scripts/cut-cc0-loops.sh <source-folder>
 #   The folder holds one <freesound-id>.mp3 per disc, at any depth (Freesound's HQ preview or the original).
