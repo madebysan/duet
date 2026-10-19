@@ -14,11 +14,3 @@ DerivedData/
 /_archived/
 # Claude Code local config and worktrees
 /.claude/
-
-# Fastlane: local credentials and run artifacts
-fastlane/.env
-fastlane/report.xml
-fastlane/README.md
-
-# Fastlane test run output
-fastlane/test_output/

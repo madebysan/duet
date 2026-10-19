@@ -49,10 +49,6 @@ xcodebuild -project MixLayer.xcodeproj -scheme MixLayer -destination 'platform=i
 | `scripts/crop-disc-art.swift` | Crops a generated top-down vinyl image to a tight square for `Assets.xcassets/DiscArt`. |
 | `scripts/generate-disc-art.swift` | Renders placeholder disc art for any sound that has no image yet; keeps existing images unless `--force`. |
 
-## Release lanes
-
-`fastlane/Fastfile` holds the App Store lanes: `preflight` (tests plus a signed Release archive), `build`, `upload_testflight`, `push_metadata`, `upload_screenshots`, `readiness`, `presubmit_check`, and `submit_app_store_review`. Credentials come from a git-ignored `fastlane/.env`; `fastlane/.env.example` lists the variables. Listing text lives in `fastlane/metadata/`, the store screenshots in `fastlane/screenshots/en-US/`. Run Fastlane with `LC_ALL=en_US.UTF-8`.
-
 ## Design constraints
 
 - `.mixWithOthers` stays. Playing under other apps is the whole point of Duet.

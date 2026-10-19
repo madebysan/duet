@@ -4,8 +4,6 @@
 
 Dark, quiet, and tactile. Duet should feel like a small CD player you reach for, not a file manager: open it, set the level, pick a disc, leave. Each sound is a bare CD; the disc's finish carries the color, and the screen glows faintly in that color.
 
-Reference: Untitled's disc flows on Mobbin (iridescent discs, tactile motion). Cases were tried and removed on 2026-10-18. Fallback direction if this doesn't hold up: a TIDE-style full-screen ambient home (see `backlog.md`, UI).
-
 ## Colors
 
 | Token | Value | Use |
@@ -37,7 +35,7 @@ Discs are circles with a translucent inner ring and a dark spindle hole, shown b
 
 ## Layout
 
-Two screens. The main screen is the "Dial" direction, picked on 2026-10-18 from three prototypes (archived in `prototypes/history/duet-main-screen/`).
+Two screens. The main screen is the "Dial" direction, picked on 2026-10-18 from three prototypes.
 
 - **Main screen**, no title bar: the dial, the name block (category label and 30 pt title), a scrub row, and − / play (76 pt) / + are stacked and centered vertically as one group. No status labels (Ready, Looping, Paused): the play button and spinning disc show the state; a line under the title appears only for an audio problem or the Add files hint. No percentage readout: the ring shows the level. A Your files icon button sits top-right.
 - **Scrub row (your files only)**: elapsed time, a slim 3 pt line tinted with the glow (7 pt while dragging), and the total. Drag to jump; the jump happens on release so audio doesn't stutter. VoiceOver adjusts by 15 s. For built-in sounds the row stays empty so the controls don't move.
@@ -68,7 +66,7 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | Built-in sounds | Ten recorded loops in three groups: Rain (Steady rain, Porch rain, Rain on leaves, Gentle rain), Forest (Woodland, Blackbird, Forest wind), Ocean (Soft surf, Breakers, Beach). A disc with no audio is left out. The generated noise and synth sounds were removed on 2026-10-18 |
 | Where the audio comes from | A CC0 Freesound recording per disc, cut to a loop of up to 10 minutes (3:16 to 10:03; san, 2026-10-18) in `MixLayer/Resources/Sounds/<id>.m4a`, 128 kbps AAC, about 66 MB for all ten, sourced in `CREDITS.md`. |
 | Choosing a sound | Swipe the carousel. Swiping while playing switches playback to the new disc; swiping while paused only loads it. Selection commits 0.28 s after the swipe settles so passing discs don't each start. |
-| Disc art | Each built-in sound prints a generated vinyl image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Made with Nano Banana Pro in the Magnific web app from the prompts in `artifacts/disc-art/prompts.md` (top-down record, plain off-white label at about a third of the diameter, no text), then cropped with `scripts/crop-disc-art.swift`. Each category mixes vinyl techniques (splatter, smoke, marble, rings, colour-in-colour, half-and-half). A light sheen from the sound's finish is blended over the art |
+| Disc art | Each built-in sound prints a generated vinyl image on its disc: `MixLayer/Assets.xcassets/DiscArt/disc-<sound-id>.imageset/`. Made with Nano Banana Pro in the Magnific web app from text prompts (top-down record, plain off-white label at about a third of the diameter, no text), then cropped with `scripts/crop-disc-art.swift`. Each category mixes vinyl techniques (splatter, smoke, marble, rings, colour-in-colour, half-and-half). A light sheen from the sound's finish is blended over the art |
 | Your files | Picked with the Files picker (works with Google Drive); remembered across launches with security-scoped bookmarks. Audio already in Duet's own folder (Files › On My iPhone › Duet) is listed automatically, refreshed each time the app opens; removing one hides it (`hiddenFolderFiles`) and picking it again brings it back |
 | File formats | MP3, M4A, M4B, AAC, WAV, AIFF, CAF, and FLAC (added 2026-10-18). FLAC tags and covers come from `FLACTags.swift`, since Apple's metadata API skips them |
 | File covers | A file's embedded cover art is printed on its disc and drives its glow (same `DiscAccent` picker as the built-in discs); files without a cover use the silver burned disc |
@@ -108,7 +106,7 @@ Reduce Motion turns off the spin; the slide still happens. Rotation is a pure fu
 | 2026-10-18 | Slim scrub line and per-file resume for your files; thinner ring closer to the disc; status labels removed | Long files shouldn't always restart; the ring and labels were heavier than needed |
 | 2026-10-18 | Glow comes from each disc's art (`DiscAccent`), not a per-category colour | Blackbird is black with yellow spots and was glowing green |
 | 2026-10-18 | One file at a time: every disc loops on its own; Loop one / Play all / Shuffle removed; each file is its own disc | san wants a single sound playing, whether built-in or uploaded |
-| 2026-10-17 | CD library based on Untitled's disc flows | Tactile, memorable, and each sound gets an identity |
+| 2026-10-17 | CD library: each sound is a disc | Tactile, memorable, and each sound gets an identity |
 | 2026-10-17 | Drop folder import, keep file picking only | The folder button was unreachable and Google Drive greys out folders anyway |
 | 2026-10-17 | Remember picked files with bookmarks | Re-picking every launch was the biggest friction |
 | 2026-10-17 | Disc stays out on pause, spins down over 0.6 s | Pauses are brief; tucking in would read as "stopped" |

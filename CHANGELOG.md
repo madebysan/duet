@@ -9,7 +9,7 @@
 - New main screen ("Dial", picked from three prototypes): the disc sits inside a volume ring you drag; big percentage readout; − / play / + at the bottom; Your files as a top-right button.
 - One file at a time: every disc loops on its own, and each uploaded file is its own disc. Removed Loop one / Play all / Shuffle and the single Your mix disc.
 - Replaced the placeholder disc art with 16 generated vinyl records (Nano Banana Pro via Magnific), one colour story per sound.
-- New app icon: two glowing translucent records (cyan and magenta overlapping into violet) on midnight navy, generated with Nano Banana Pro; all sizes regenerated, README icon re-rounded. Source kept at `artifacts/icon/duet-icon-2026-10-18-source.webp`.
+- New app icon: two glowing translucent records (cyan and magenta overlapping into violet) on midnight navy, generated with Nano Banana Pro; all sizes regenerated, README icon re-rounded.
 - Main screen: dial, name, and controls centered as one group; the percentage readout is gone (the ring shows the level).
 - Swipe anywhere, including on the name, to move one disc; the name slides out and the next slides in, so only one is ever visible.
 - Each disc's glow now comes from its own art (Blackbird glows gold, not green); `DiscAccentTests` checks all 16.
@@ -42,4 +42,3 @@
 - Added `Pick Files` as a fallback for Google Drive and other providers that do not allow folder selection.
 - Generated and installed a bitmap app icon.
 - Built and installed the app on san's connected iPhone.
-- Moved the project into `~/Projects/layer-player`.
