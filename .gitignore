@@ -22,3 +22,11 @@ DerivedData/
 fastlane/.env
 fastlane/report.xml
 fastlane/README.md
+
+# Duet video render output and third-party preview audio
+/video/out/
+/video/review/
+/video/track-previews/
+
+# Fastlane test run output
+fastlane/test_output/

@@ -2,10 +2,10 @@
 
 <h1>Duet</h1>
 
-<p>Play local audio quietly under another iPhone app.<br>
-Built for music, loops, and audiobooks while YouTube or another audio app keeps playing.</p>
+<p>An iPhone audio player that keeps playing under other apps.<br>
+Rain, forest and ocean loops, or your own files, mixed under YouTube, podcasts or anything else.</p>
 
-<p><strong>Version 0.1</strong> · iOS 17+ · personal device build</p>
+<p><strong>Version 1.0</strong> · iOS 17 or later · iPhone</p>
 
 <p>
   <img src="https://img.shields.io/badge/Swift-f05138" alt="Swift">
@@ -13,64 +13,40 @@ Built for music, loops, and audiobooks while YouTube or another audio app keeps 
   <img src="https://img.shields.io/badge/iOS-000000" alt="iOS">
 </p>
 
-![Duet on iPhone: Steady rain looping at 45% inside the volume dial, Synth ocean at 70%, and the Your files sheet with two demo files](assets/screenshot.png)
+![Duet on iPhone: Steady rain playing inside the volume ring, the Your files sheet with three demo recordings, and a pink demo disc called Piano practice with its scrub line](assets/screenshot.png)
 
-Duet uses a mixable `AVAudioSession` so its audio keeps playing when another app starts audio: YouTube, Podcasts, Spotify, anything. iOS normally lets these apps interrupt each other; Duet runs under them.
+Duet plays audio under whatever else your iPhone is playing. Start a rain loop, then open YouTube, a podcast or Spotify: iOS would normally stop one for the other, but Duet keeps going underneath at its own level. It is for anyone who wants steady background sound, or an audiobook, behind another app.
 
-Everything is on one screen: a CD in the middle of a volume dial (drag the ring to set the level), swipe to change discs, and a big play button. Each built-in sound (noise, rain, forest, ocean) has its own vinyl disc that glows and spins while playing. Files you add from Files, iCloud, or Google Drive each become a disc of their own and are remembered across launches. One disc plays at a time, and it loops until you change it.
+- Ten recorded loops ship with it, rain, forest and ocean, each on its own disc.
+- Files from iCloud or Google Drive become discs too, and remember where you stopped.
+- One screen: swipe between discs, tap to play, drag the ring to set the volume.
 
-Not on TestFlight or the App Store. Personal build signed to a connected iPhone.
+## How it works
 
-## Project Walkthrough
+Duet opens its audio session as playback that mixes with others. iOS then lets it run alongside the app in front instead of interrupting it, with the screen off too. The lock screen shows the current disc with play, pause, next and previous.
 
-| File | Role |
-|---|---|
-| `MixLayerApp.swift` | App entry point. Creates `AudioPlayerModel`, boots the library on launch, supports `--autoplay-sample` for QA (plays the first sound). |
-| `AudioPlayerModel.swift` | Core model: mixable audio session, built-in sounds, your files with bookmarks, looping, volume, interruptions, lock-screen controls. |
-| `PlaybackLogic.swift` | Pure, unit-tested logic: disc order for next/previous, volume stepping, dial geometry, disc spin math. |
-| `SoundCatalog.swift` | Built-in sounds, their categories, disc finishes, and `DiscAccent` (glow colour picked from each disc's art). |
-| `AudioTrack.swift` | `AudioTrack` for a sound or a file; `load()` reads file metadata and covers. |
-| `FLACTags.swift` | Reads FLAC titles, artists, albums and covers, which Apple's metadata API skips. |
-| `AudioMetadataCache.swift` | On-device metadata cache so reopening the same files is fast. |
-| `ContentView.swift` | Main screen (header, volume dial around the disc carousel, transport) and the Your files sheet. |
-| `DiscViews.swift` | Disc face, spinning disc, and the carousel disc. |
-| `scripts/crop-disc-art.swift` | Crops a generated top-down vinyl photo to a tight square for `Assets.xcassets/DiscArt`. |
-| `scripts/generate-disc-art.swift` | Renders placeholder disc art for any sound that doesn't have an image yet; keeps existing images unless `--force`. |
-| `scripts/cut-cc0-loops.sh` | Cuts the shipping loops (up to 10 minutes each) from the CC0 Freesound recordings listed in `MixLayer/Resources/Sounds/CREDITS.md`. |
-| `scripts/cut-personal-loops.sh` / `cut-loop.py` | Cuts seamless, level-matched loops from san's downloaded recordings into the git-ignored `MixLayer/PersonalSounds/` (Debug builds only). `cut-loop.py` also cuts the licensed loops in `MixLayer/Resources/Sounds/`. |
-| `project.yml` | XcodeGen source. Re-generate with `xcodegen generate` if changed. |
+The disc in the middle is the one playing. Swipe anywhere to move to the next disc, tap it to play or pause, and drag the small knob around the ring to set Duet's level, which is separate from the system volume. Every disc loops until you change it.
 
-## Agent Onboarding
+The record button at the top right opens Your files. Add files picks audio with the system document picker, and anything you drop into On My iPhone › Duet in the Files app appears there on its own. Duet reads AAC, AIFF, CAF, FLAC, M4A, M4B, MP3 and WAV, including FLAC titles and cover art, which Apple's metadata API skips. Files get a thin scrub line and resume where you left them.
 
-If you are starting work on Duet, read these first in order:
+The built-in loops are CC0 field recordings from [Freesound](https://freesound.org), cut into seamless loops; every source is listed in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md). The disc art is our own, generated for each sound.
 
-1. **`AGENTS.md`**: build and install commands, constraints (`.mixWithOthers`, file picking, looping)
-2. **`plan.md`**: current state, what was verified, next steps
-3. **`backlog.md`**: upcoming work by area
+## Privacy
 
-## Build
+No accounts, no analytics, no network calls. Picked files stay where they are; Duet keeps a bookmark to each one, a small metadata cache, the volume and the resume positions on the device. The full policy is at [santiagoalonso.com/duet/privacy](https://santiagoalonso.com/duet/privacy).
 
-`AGENTS.md` has the exact device-build and install commands. General flow:
+## Limits
 
-```bash
-xcodegen generate
-xcodebuild -project MixLayer.xcodeproj -scheme MixLayer -destination 'platform=iOS,id=00008150-000A48500132401C' -derivedDataPath build/DerivedData -allowProvisioningUpdates build
-xcrun devicectl device install app --device CFC63A02-476D-534D-A1FC-815D2D8EF980 build/DerivedData/Build/Products/Debug-iphoneos/MixLayer.app
-```
+One disc plays at a time; there is no layering of two sounds. Portrait iPhone only. The Xcode project, scheme and bundle id still carry Duet's first name, MixLayer.
 
-Clean build if you hit stale caching:
+## Install
 
-```bash
-rm -rf build/DerivedData
-```
+Duet 1.0 was submitted to the App Store on October 18, 2026 and is waiting for review; the store link goes here when it is approved. Support is at [santiagoalonso.com/duet/support](https://santiagoalonso.com/duet/support).
 
-## Key Constraints
-
-- **Do not remove `.mixWithOthers`.** Playing under other apps is the whole point of Duet.
-- **Import by picking files only.** Folder import was removed on 2026-10-17.
-- **Google Drive support stays as file-picker fallback** unless Drive API integration is explicitly requested.
-- **Never commit `build/`** or DerivedData.
+To build it yourself you need Xcode 27 and [XcodeGen](https://github.com/yonaskolb/XcodeGen). Run `xcodegen generate`, open `MixLayer.xcodeproj`, and run the MixLayer scheme on a simulator or your iPhone. The source files, device install command, tests, scripts and release lanes are in [docs/how-it-works.md](docs/how-it-works.md).
 
 ---
+
+[MIT](LICENSE) for the code and the disc art. The ten loops are CC0 recordings credited in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md).
 
 Made by [santiagoalonso.com](https://santiagoalonso.com)
