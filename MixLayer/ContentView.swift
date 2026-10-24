@@ -327,8 +327,7 @@ private struct ScrubLine: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(timeString(fraction * duration))
-                .frame(width: 44, alignment: .trailing)
+            timeLabel(timeString(fraction * duration), alignment: .trailing)
 
             GeometryReader { proxy in
                 let height: CGFloat = dragFraction == nil ? 3 : 7
@@ -355,8 +354,7 @@ private struct ScrubLine: View {
             }
             .frame(height: 30)
 
-            Text(timeString(duration))
-                .frame(width: 44, alignment: .leading)
+            timeLabel(timeString(duration), alignment: .leading)
         }
         .font(.system(size: 12, weight: .medium))
         .monospacedDigit()
@@ -368,6 +366,16 @@ private struct ScrubLine: View {
             let step: TimeInterval = direction == .increment ? 15 : -15
             onSeek(time + step)
         }
+    }
+
+    /// One line, never wrapped. Both labels reserve the width of the longest time this file can
+    /// show ("0:00" up to "10:00:00"), so the line keeps its length while the elapsed time ticks.
+    private func timeLabel(_ text: String, alignment: Alignment) -> some View {
+        Text(timeString(duration).replacingOccurrences(of: #"\d"#, with: "8", options: .regularExpression))
+            .hidden()
+            .overlay(alignment: alignment) { Text(text).fixedSize() }
+            .lineLimit(1)
+            .fixedSize()
     }
 }
 
@@ -786,10 +794,13 @@ private struct FileRow: View {
                     .accessibilityHidden(true)
             }
 
+            // Never wraps or shrinks; a long title truncates instead.
             Text(timeString(track.duration))
                 .font(.system(size: 12, weight: .medium))
                 .monospacedDigit()
                 .foregroundStyle(MixTheme.textTertiary)
+                .lineLimit(1)
+                .fixedSize()
         }
         .accessibilityElement(children: .combine)
         .accessibilityValue(isCurrent ? (isPlaying ? "Playing" : "Paused") : "")
