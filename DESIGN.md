@@ -19,15 +19,17 @@ Each disc's glow is read from its own art: `DiscAccent` in `SoundCatalog.swift` 
 
 ## Typography
 
-System fonts only, rounded design for display text.
+System fonts only, rounded design for display text. All text follows the system text size (Dynamic Type); sizes below are at the default size. Icons inside fixed circles (play, nudges, Your files) stay fixed.
 
 | Role | Style |
 |---|---|
-| Disc title | 30 pt, bold, rounded (scales down to 70% before truncating) |
-| Category label | 12 pt, semibold, uppercase, 1.2 tracking |
-| Scrub times | 12 pt, medium, monospaced digits |
-| Audio problem / Add files hint | 13 pt, medium |
-| Your files sheet rows | 15 pt semibold title, 12 pt details |
+| Disc title | 30 pt, bold, rounded, scales like Title (scales down to 70% before truncating, always one line) |
+| Category label | Caption (12 pt), semibold, uppercase, 1.2 tracking |
+| Scrub times | Caption (12 pt), medium, monospaced digits, one line |
+| Audio problem / Add files hint | Footnote (13 pt), medium |
+| Your files sheet rows | Subheadline (15 pt) semibold title, Caption (12 pt) details and duration |
+
+Caps (san, 2026-10-24): the main screen stops growing at the first accessibility size, because the 344 pt dial and the controls don't scale and the centered group must still fit an iPhone SE. The Your files sheet scrolls as one piece (the note and Add files scroll with the list), so it grows to the third accessibility size; at accessibility sizes a row gives the title two lines and moves the duration to the details line.
 
 ## Shape Language
 

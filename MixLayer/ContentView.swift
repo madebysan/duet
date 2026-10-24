@@ -95,6 +95,9 @@ struct ContentView: View {
                 .padding(.trailing, 18)
         }
         .background(background)
+        // Text follows the system size, but the 344 pt dial and the controls don't, so past
+        // the first accessibility size the centered group would no longer fit an iPhone SE.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .preferredColorScheme(.dark)
         .sheet(isPresented: $isShowingFiles) {
             FilesSheet()
@@ -146,13 +149,13 @@ struct ContentView: View {
     private var nameBlock: some View {
         VStack(spacing: 6) {
             Text(categoryLabel)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .tracking(1.2)
                 .textCase(.uppercase)
                 .foregroundStyle(MixTheme.textSecondary)
 
             Text(isAddCentered ? "Add files" : (displayedTrack?.title ?? "Swipe to choose"))
-                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .scaledFont(size: 30, relativeTo: .title, weight: .bold, design: .rounded)
                 .foregroundStyle(MixTheme.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -162,7 +165,7 @@ struct ContentView: View {
             // This line only appears for an audio problem or the Add files hint.
             if let note = player.audioProblem ?? (isAddCentered ? "Bring your own audio" : nil) {
                 Text(note)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.footnote.weight(.medium))
                     .foregroundStyle(player.audioProblem == nil ? MixTheme.textSecondary : .red.opacity(0.85))
                     .lineLimit(1)
             }
@@ -194,7 +197,7 @@ struct ContentView: View {
             Haptics.impact(.light)
             isShowingFiles = true
         } label: {
-            Image(systemName: "opticaldisc")
+            Image(systemName: "music.note.list")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(MixTheme.textPrimary)
                 .frame(width: 44, height: 44)
@@ -356,7 +359,7 @@ private struct ScrubLine: View {
 
             timeLabel(timeString(duration), alignment: .leading)
         }
-        .font(.system(size: 12, weight: .medium))
+        .font(.caption.weight(.medium))
         .monospacedDigit()
         .foregroundStyle(MixTheme.textSecondary)
         .accessibilityElement()
@@ -528,6 +531,7 @@ private struct FilesSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         .preferredColorScheme(.dark)
     }
 }
@@ -628,73 +632,82 @@ private struct FilesPanel: View {
 
     var body: some View {
         if player.fileTracks.isEmpty && !player.isLoadingFiles {
-            emptyState
+            ScrollView {
+                emptyState
+            }
+            .scrollBounceBehavior(.basedOnSize)
         } else {
-            VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    Text("Each file is its own disc and loops until you change it.")
-                        .font(.system(size: 13))
-                        .foregroundStyle(MixTheme.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
+            // The note and Add files scroll with the list, so at large text sizes they don't
+            // crowd the files out of a half-height sheet.
+            List {
+                header
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 12, trailing: 20))
 
-                    Spacer(minLength: 0)
-
-                    Menu {
-                        Button(role: .destructive) {
-                            player.removeAllFiles()
-                        } label: {
-                            Label("Remove all files", systemImage: "trash")
-                        }
+                ForEach(player.fileTracks) { track in
+                    Button {
+                        Haptics.impact(.medium)
+                        player.play(track: track)
                     } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(MixTheme.textSecondary)
-                            .frame(width: 32, height: 32)
-                            .background(MixTheme.surface)
-                            .clipShape(Circle())
+                        FileRow(
+                            track: track,
+                            isCurrent: player.currentTrack == track,
+                            isPlaying: player.isPlaying && player.currentTrack == track
+                        )
+                        .contentShape(Rectangle())
                     }
-                    .accessibilityLabel("More")
-                }
-                .padding(.horizontal, 20)
-
-                addFilesButton
-                    .padding(.horizontal, 20)
-
-                if let problem = player.fileImportProblem {
-                    Text(problem)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.red.opacity(0.85))
-                        .padding(.horizontal, 20)
-                }
-
-                List {
-                    ForEach(player.fileTracks) { track in
-                        Button {
-                            Haptics.impact(.medium)
-                            player.play(track: track)
+                    .buttonStyle(.plain)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparatorTint(.white.opacity(0.08))
+                    .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            withAnimation { player.removeFile(track) }
                         } label: {
-                            FileRow(
-                                track: track,
-                                isCurrent: player.currentTrack == track,
-                                isPlaying: player.isPlaying && player.currentTrack == track
-                            )
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparatorTint(.white.opacity(0.08))
-                        .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                withAnimation { player.removeFile(track) }
-                            } label: {
-                                Label("Remove", systemImage: "trash")
-                            }
+                            Label("Remove", systemImage: "trash")
                         }
                     }
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+    }
+
+    private var header: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                Text("Each file is its own disc and loops until you change it.")
+                    .font(.footnote)
+                    .foregroundStyle(MixTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 0)
+
+                Menu {
+                    Button(role: .destructive) {
+                        player.removeAllFiles()
+                    } label: {
+                        Label("Remove all files", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(MixTheme.textSecondary)
+                        .frame(width: 32, height: 32)
+                        .background(MixTheme.surface)
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel("More")
+            }
+
+            addFilesButton
+
+            if let problem = player.fileImportProblem {
+                Text(problem)
+                    .font(.footnote)
+                    .foregroundStyle(.red.opacity(0.85))
             }
         }
     }
@@ -704,17 +717,21 @@ private struct FilesPanel: View {
             Haptics.impact(.medium)
             isImportingFiles = true
         } label: {
-            Label("Add files", systemImage: "plus")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(MixTheme.textPrimary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(MixTheme.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(.white.opacity(0.10), lineWidth: 1)
-                )
+            // Not a Label: inside a List a Label widens its icon gap.
+            HStack(spacing: 8) {
+                Image(systemName: "plus")
+                Text("Add files")
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(MixTheme.textPrimary)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(MixTheme.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(.white.opacity(0.10), lineWidth: 1)
+            )
         }
         .buttonStyle(PressScaleStyle())
     }
@@ -726,18 +743,18 @@ private struct FilesPanel: View {
                 .foregroundStyle(MixTheme.textSecondary)
 
             Text("Burn your own disc")
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .font(.system(.headline, design: .rounded, weight: .bold))
                 .foregroundStyle(MixTheme.textPrimary)
 
             Text("Pick audio from Files, iCloud, or Google Drive. Duet remembers it for next time.")
-                .font(.system(size: 14))
+                .scaledFont(size: 14, relativeTo: .subheadline)
                 .foregroundStyle(MixTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
             if let problem = player.fileImportProblem {
                 Text(problem)
-                    .font(.system(size: 13))
+                    .font(.footnote)
                     .foregroundStyle(.red.opacity(0.85))
                     .multilineTextAlignment(.center)
             }
@@ -756,54 +773,114 @@ private struct FileRow: View {
     let isCurrent: Bool
     let isPlaying: Bool
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                if let artwork = track.artwork {
-                    Image(uiImage: artwork)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    MixTheme.surface
-                    Image(systemName: "music.note")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(MixTheme.textTertiary)
+            artwork
+
+            if typeSize.isAccessibilitySize {
+                // Big text: the title gets the whole width, and the duration moves to the
+                // details line so it still fits on one line.
+                VStack(alignment: .leading, spacing: 3) {
+                    title.lineLimit(2)
+                    HStack(spacing: 8) {
+                        details
+                        Spacer(minLength: 8)
+                        status
+                    }
                 }
+            } else {
+                VStack(alignment: .leading, spacing: 3) {
+                    title.lineLimit(1)
+                    details
+                }
+
+                Spacer(minLength: 8)
+
+                status
             }
-            .frame(width: 44, height: 44)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(track.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(isCurrent ? MixTheme.textPrimary : MixTheme.textPrimary.opacity(0.88))
-                    .lineLimit(1)
-                Text(track.artist ?? track.url.pathExtension.uppercased())
-                    .font(.system(size: 12))
-                    .foregroundStyle(MixTheme.textSecondary)
-                    .lineLimit(1)
-            }
-
-            Spacer(minLength: 8)
-
-            if isCurrent {
-                Image(systemName: "waveform")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(MixTheme.accent)
-                    .symbolEffect(.variableColor.iterative, isActive: isPlaying)
-                    .accessibilityHidden(true)
-            }
-
-            // Never wraps or shrinks; a long title truncates instead.
-            Text(timeString(track.duration))
-                .font(.system(size: 12, weight: .medium))
-                .monospacedDigit()
-                .foregroundStyle(MixTheme.textTertiary)
-                .lineLimit(1)
-                .fixedSize()
         }
         .accessibilityElement(children: .combine)
         .accessibilityValue(isCurrent ? (isPlaying ? "Playing" : "Paused") : "")
+    }
+
+    private var artwork: some View {
+        ZStack {
+            if let artwork = track.artwork {
+                Image(uiImage: artwork)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                MixTheme.surface
+                Image(systemName: "music.note")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(MixTheme.textTertiary)
+            }
+        }
+        .frame(width: 44, height: 44)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private var title: some View {
+        Text(track.title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(isCurrent ? MixTheme.textPrimary : MixTheme.textPrimary.opacity(0.88))
+    }
+
+    private var details: some View {
+        Text(track.artist ?? track.url.pathExtension.uppercased())
+            .font(.caption)
+            .foregroundStyle(MixTheme.textSecondary)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder
+    private var status: some View {
+        if isCurrent {
+            Image(systemName: "waveform")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(MixTheme.accent)
+                .symbolEffect(.variableColor.iterative, isActive: isPlaying)
+                .accessibilityHidden(true)
+        }
+
+        // Never wraps or shrinks; a long title truncates instead.
+        Text(timeString(track.duration))
+            .font(.caption.weight(.medium))
+            .monospacedDigit()
+            .foregroundStyle(MixTheme.textTertiary)
+            .lineLimit(1)
+            .fixedSize()
+    }
+}
+
+extension View {
+    /// A design size (in points at the default text size) that grows and shrinks with Dynamic
+    /// Type like the given text style, for sizes no text style matches exactly.
+    func scaledFont(
+        size: CGFloat,
+        relativeTo style: Font.TextStyle,
+        weight: Font.Weight = .regular,
+        design: Font.Design = .default
+    ) -> some View {
+        modifier(ScaledFont(size: size, style: style, weight: weight, design: design))
+    }
+}
+
+private struct ScaledFont: ViewModifier {
+    @ScaledMetric private var size: CGFloat
+    let weight: Font.Weight
+    let design: Font.Design
+
+    init(size: CGFloat, style: Font.TextStyle, weight: Font.Weight, design: Font.Design) {
+        _size = ScaledMetric(wrappedValue: size, relativeTo: style)
+        self.weight = weight
+        self.design = design
+    }
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: size, weight: weight, design: design))
     }
 }
 

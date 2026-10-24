@@ -6,6 +6,8 @@
 - New discs: Creek and Coffee shop (CC0 recordings), the three noises (generated), and Box breathing, a 4-4-4-4 breathing guide that loops seamlessly. Each has its own disc art.
 - The white highlight streak on every disc is gone (san, 2026-10-24).
 - Files an hour or longer show their elapsed and total times on one line (they used to wrap), and the scrub line keeps its length while the time ticks. Checked on iPhone SE with titles in Japanese, very long titles and a 10-hour file.
+- Text follows the system text size (Settings › Display & Text Size › Larger Text). The main screen grows up to the first accessibility size so the dial and controls still fit; Your files grows further, and its rows give long titles two lines at the largest sizes.
+- The Your files button at the top right shows a list icon instead of a disc.
 
 ## 2026-10-18
 
