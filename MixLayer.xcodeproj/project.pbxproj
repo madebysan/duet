@@ -20,6 +20,7 @@
 		765CFD92A483AF2660F190FF /* blackbird.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D77BDDF190AC75146AB6481A /* blackbird.m4a */; };
 		8887FCD321D89B843BFAE466 /* beach.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D288EC133D5AF69682170E62 /* beach.m4a */; };
 		8D38060FE5CBECB50E4C08FA /* rain-on-leaves.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E235F32095F41A2996731704 /* rain-on-leaves.m4a */; };
+		910913F80EECD1C0AEC2CE1A /* box-breathing.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 55B60F06FDA1A5F09AE791F7 /* box-breathing.m4a */; };
 		99C969146407BEDE345B23FA /* PlaybackLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D6782492BE34585566BFC3 /* PlaybackLogicTests.swift */; };
 		ACC8D512714CAA18BC0BFC7E /* gentle-rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9A8FA3290069ED998EA7A906 /* gentle-rain.m4a */; };
 		AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */; };
@@ -50,6 +51,7 @@
 		20240D3D5D0D618FFD839FCD /* MixLayer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MixLayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTagsTests.swift; sourceTree = "<group>"; };
 		507D43B59C98FDCA7F301309 /* DiscViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscViews.swift; sourceTree = "<group>"; };
+		55B60F06FDA1A5F09AE791F7 /* box-breathing.m4a */ = {isa = PBXFileReference; path = "box-breathing.m4a"; sourceTree = "<group>"; };
 		5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		612543094381786A9E1F77D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		61B8B1F71BE57DAD18C865EF /* FLACTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTags.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 			children = (
 				D288EC133D5AF69682170E62 /* beach.m4a */,
 				D77BDDF190AC75146AB6481A /* blackbird.m4a */,
+				55B60F06FDA1A5F09AE791F7 /* box-breathing.m4a */,
 				949A8699251A7C82ACC28C74 /* breakers.m4a */,
 				D62047E6C127441C1C6C2926 /* CREDITS.md */,
 				C765F60DFDF45B1AF967CA33 /* forest-wind.m4a */,
@@ -259,6 +262,7 @@
 				FF947C98699412B4C10E1C11 /* PrivacyInfo.xcprivacy in Resources */,
 				8887FCD321D89B843BFAE466 /* beach.m4a in Resources */,
 				765CFD92A483AF2660F190FF /* blackbird.m4a in Resources */,
+				910913F80EECD1C0AEC2CE1A /* box-breathing.m4a in Resources */,
 				2AD91D38A27C61635F906B1E /* breakers.m4a in Resources */,
 				DEE9F57DB7FA03FBC1A04A4F /* forest-wind.m4a in Resources */,
 				ACC8D512714CAA18BC0BFC7E /* gentle-rain.m4a in Resources */,

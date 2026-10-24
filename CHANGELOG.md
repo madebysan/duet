@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- New built-in disc, Box breathing, in a new Mindfulness category: a 4-4-4-4 breathing guide (inhale, hold, exhale, hold) that loops seamlessly, with its own lavender-and-saffron disc art.
+
 ## 2026-10-18
 
 - A swipeable CD carousel replaces the sound shelf and tabs. Swipe anywhere, including on the name, to move one disc; tap the centered disc to play or pause.

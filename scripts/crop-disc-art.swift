@@ -3,6 +3,8 @@
 // for MixLayer/Assets.xcassets/DiscArt. Usage: swift scripts/crop-disc-art.swift in.(png|jpg) out.jpg
 // Convert .webp first: sips -s format png in.webp --out in.png
 // usage: crop.swift in.png out.jpg  -> finds the disc against the light background, crops a square to it, saves 1024 JPEG
+import AppKit
+
 let args = CommandLine.arguments
 let img = NSImage(contentsOfFile: args[1])!.cgImage(forProposedRect: nil, context: nil, hints: nil)!
 let w = img.width, h = img.height

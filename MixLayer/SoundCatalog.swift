@@ -18,7 +18,7 @@ struct DiscFinish: Equatable {
 }
 
 enum SoundCategory: String, CaseIterable, Identifiable {
-    case rain, forest, ocean
+    case rain, forest, ocean, mindfulness
 
     var id: String { rawValue }
 
@@ -27,6 +27,7 @@ enum SoundCategory: String, CaseIterable, Identifiable {
         case .rain: "Rain"
         case .forest: "Forest"
         case .ocean: "Ocean"
+        case .mindfulness: "Mindfulness"
         }
     }
 }
@@ -62,7 +63,8 @@ enum SoundCatalog {
         sound("forest-wind", "Forest wind", "wind", .forest),
         sound("soft-surf", "Soft surf", "water.waves", .ocean),
         sound("breakers", "Breakers", "figure.surfing", .ocean),
-        sound("beach", "Beach", "beach.umbrella.fill", .ocean)
+        sound("beach", "Beach", "beach.umbrella.fill", .ocean),
+        sound("box-breathing", "Box breathing", "lungs.fill", .mindfulness)
     ]
 
     static func sound(id: String?) -> BuiltInSound? {
@@ -91,6 +93,11 @@ enum SoundCatalog {
             DiscFinish(
                 sheen: rgb([(0.35, 0.70, 0.80), (0.05, 0.27, 0.49), (0.70, 0.90, 0.95), (0.35, 0.70, 0.80)]),
                 glow: Color(red: 0.20, green: 0.55, blue: 0.75)
+            )
+        case .mindfulness:
+            DiscFinish(
+                sheen: rgb([(0.72, 0.62, 0.80), (0.55, 0.44, 0.66), (0.96, 0.84, 0.66), (0.72, 0.62, 0.80)]),
+                glow: Color(red: 0.62, green: 0.50, blue: 0.74)
             )
         }
     }
