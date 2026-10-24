@@ -3,7 +3,7 @@
 <h1>Duet</h1>
 
 <p>An iPhone audio player that keeps playing under other apps.<br>
-Rain, forest and ocean loops, or your own files, mixed under YouTube, podcasts or anything else.</p>
+Built-in nature, noise and café loops, or your own files, mixed under YouTube, podcasts or anything else.</p>
 
 <p><strong>Version 1.0</strong> · iOS 17 or later · iPhone</p>
 
@@ -17,7 +17,7 @@ Rain, forest and ocean loops, or your own files, mixed under YouTube, podcasts o
 
 Duet plays audio under whatever else your iPhone is playing. Start a rain loop, then open YouTube, a podcast or Spotify: iOS would normally stop one for the other, but Duet keeps going underneath at its own level. It is for anyone who wants steady background sound, or an audiobook, behind another app.
 
-- Ten recorded loops ship with it, rain, forest and ocean, each on its own disc.
+- Ten built-in discs: rain, forest, birds, creek, ocean, a coffee shop, white, pink and brown noise, and a box-breathing guide.
 - Files from iCloud or Google Drive become discs too, and remember where you stopped.
 - One screen: swipe between discs, tap to play, drag the ring to set the volume.
 
@@ -27,9 +27,9 @@ Duet opens its audio session as playback that mixes with others. iOS then lets i
 
 The disc in the middle is the one playing. Swipe anywhere to move to the next disc, tap it to play or pause, and drag the small knob around the ring to set Duet's level, which is separate from the system volume. Every disc loops until you change it.
 
-The record button at the top right opens Your files. Add files picks audio with the system document picker, and anything you drop into On My iPhone › Duet in the Files app appears there on its own. Duet reads AAC, AIFF, CAF, FLAC, M4A, M4B, MP3 and WAV, including FLAC titles and cover art, which Apple's metadata API skips. Files get a thin scrub line and resume where you left them.
+The list button at the top right opens Your files. Add files picks audio with the system document picker, and anything you drop into On My iPhone › Duet in the Files app appears there on its own. Duet reads AAC, AIFF, CAF, FLAC, M4A, M4B, MP3 and WAV, including FLAC titles and cover art, which Apple's metadata API skips. Files get a thin scrub line and resume where you left them.
 
-The built-in loops are CC0 field recordings from [Freesound](https://freesound.org), cut into seamless loops; every source is listed in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md). The disc art is our own, generated for each sound.
+The nature and café discs are CC0 field recordings from [Freesound](https://freesound.org), cut into seamless loops; every source is listed in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md). The three noises are generated, and Box breathing is my own recording. The disc art is our own, generated for each sound.
 
 ## Privacy
 
@@ -47,6 +47,6 @@ To build it yourself you need Xcode 27 and [XcodeGen](https://github.com/yonasko
 
 ---
 
-[MIT](LICENSE) for the code and the disc art. The ten loops are CC0 recordings credited in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md).
+[MIT](LICENSE) for the code and the disc art. The nature and café loops are CC0 recordings credited in [CREDITS.md](MixLayer/Resources/Sounds/CREDITS.md), and the noise loops are generated. Box breathing (`box-breathing.m4a`) is © Santiago Alonso, all rights reserved, and is not covered by the MIT license.
 
 Made by [santiagoalonso.com](https://santiagoalonso.com)
