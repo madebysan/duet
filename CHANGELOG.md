@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- New built-in disc, Box breathing, in a new Mindfulness category: a 4-4-4-4 breathing guide (inhale, hold, exhale, hold) that loops seamlessly, with its own lavender-and-saffron disc art.
+- One disc per kind of sound: Rain, Forest, Birds, Creek, Ocean, Coffee shop, White noise, Pink noise, Brown noise and Box breathing, grouped as Nature, Places, Noise and Mindfulness. The extra rain, forest and ocean variations are gone.
+- New discs: Creek and Coffee shop (CC0 recordings), the three noises (generated), and Box breathing, a 4-4-4-4 breathing guide that loops seamlessly. Each has its own disc art.
+- The white highlight streak on every disc is gone (san, 2026-10-24).
 
 ## 2026-10-18
 

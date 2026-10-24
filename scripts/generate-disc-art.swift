@@ -156,9 +156,7 @@ try #"{"info":{"author":"xcode","version":1},"properties":{"provides-namespace":
 
 let designs: [(String, (CGContext, inout RNG) -> Void)] = [
     // Same motif per category, different layout per disc.
-    ("steady-rain", rain), ("porch-rain", rain), ("rain-on-leaves", rain), ("gentle-rain", rain),
-    ("woodland", forest), ("blackbird", forest), ("forest-wind", forest),
-    ("soft-surf", ocean), ("breakers", ocean), ("beach", ocean)
+    ("steady-rain", rain), ("blackbird", forest), ("forest-wind", forest), ("creek", ocean), ("soft-surf", ocean)
 ]
 let force = CommandLine.arguments.contains("--force")
 

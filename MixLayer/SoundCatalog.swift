@@ -18,15 +18,15 @@ struct DiscFinish: Equatable {
 }
 
 enum SoundCategory: String, CaseIterable, Identifiable {
-    case rain, forest, ocean, mindfulness
+    case nature, places, noise, mindfulness
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .rain: "Rain"
-        case .forest: "Forest"
-        case .ocean: "Ocean"
+        case .nature: "Nature"
+        case .places: "Places"
+        case .noise: "Noise"
         case .mindfulness: "Mindfulness"
         }
     }
@@ -52,18 +52,17 @@ struct BuiltInSound: Identifiable, Equatable {
 }
 
 enum SoundCatalog {
-    /// Every built-in disc, in shelf order. Each loops a recording; the art in DiscArt drives its glow.
+    /// Every built-in disc, in shelf order: one per kind of sound (san, 2026-10-24). The art in DiscArt drives its glow.
     static let sounds: [BuiltInSound] = [
-        sound("steady-rain", "Steady rain", "cloud.rain.fill", .rain),
-        sound("porch-rain", "Porch rain", "house.fill", .rain),
-        sound("rain-on-leaves", "Rain on leaves", "leaf.fill", .rain),
-        sound("gentle-rain", "Gentle rain", "cloud.drizzle.fill", .rain),
-        sound("woodland", "Woodland", "bird.fill", .forest),
-        sound("blackbird", "Blackbird", "bird", .forest),
-        sound("forest-wind", "Forest wind", "wind", .forest),
-        sound("soft-surf", "Soft surf", "water.waves", .ocean),
-        sound("breakers", "Breakers", "figure.surfing", .ocean),
-        sound("beach", "Beach", "beach.umbrella.fill", .ocean),
+        sound("steady-rain", "Rain", "cloud.rain.fill", .nature),
+        sound("forest-wind", "Forest", "tree.fill", .nature),
+        sound("blackbird", "Birds", "bird.fill", .nature),
+        sound("creek", "Creek", "drop.fill", .nature),
+        sound("soft-surf", "Ocean", "water.waves", .nature),
+        sound("coffee-shop", "Coffee shop", "cup.and.saucer.fill", .places),
+        sound("white-noise", "White noise", "waveform", .noise),
+        sound("pink-noise", "Pink noise", "waveform", .noise),
+        sound("brown-noise", "Brown noise", "waveform", .noise),
         sound("box-breathing", "Box breathing", "lungs.fill", .mindfulness)
     ]
 
@@ -79,20 +78,20 @@ enum SoundCatalog {
     /// Fallback look when a disc has no art.
     private static func finish(for category: SoundCategory) -> DiscFinish {
         switch category {
-        case .rain:
-            DiscFinish(
-                sheen: rgb([(0.52, 0.72, 0.92), (0.22, 0.54, 0.87), (0.80, 0.90, 1.00), (0.52, 0.72, 0.92)]),
-                glow: Color(red: 0.22, green: 0.54, blue: 0.87)
-            )
-        case .forest:
+        case .nature:
             DiscFinish(
                 sheen: rgb([(0.36, 0.79, 0.65), (0.11, 0.62, 0.46), (0.75, 0.93, 0.80), (0.36, 0.79, 0.65)]),
                 glow: Color(red: 0.11, green: 0.62, blue: 0.46)
             )
-        case .ocean:
+        case .places:
             DiscFinish(
-                sheen: rgb([(0.35, 0.70, 0.80), (0.05, 0.27, 0.49), (0.70, 0.90, 0.95), (0.35, 0.70, 0.80)]),
-                glow: Color(red: 0.20, green: 0.55, blue: 0.75)
+                sheen: rgb([(0.86, 0.74, 0.60), (0.55, 0.36, 0.22), (0.96, 0.90, 0.80), (0.86, 0.74, 0.60)]),
+                glow: Color(red: 0.72, green: 0.50, blue: 0.30)
+            )
+        case .noise:
+            DiscFinish(
+                sheen: rgb([(0.82, 0.82, 0.86), (0.60, 0.60, 0.66), (0.95, 0.95, 0.97), (0.82, 0.82, 0.86)]),
+                glow: Color(red: 0.70, green: 0.70, blue: 0.78)
             )
         case .mindfulness:
             DiscFinish(

@@ -59,13 +59,6 @@ struct DiscFace: View {
                         )
                     )
 
-                // Highlight streak so the rotation reads even on soft finishes.
-                Capsule()
-                    .fill(.white.opacity(0.35))
-                    .frame(width: size * 0.035, height: size * 0.26)
-                    .offset(y: -size * 0.3)
-                    .blur(radius: size * 0.006)
-
                 Circle()
                     .fill(.white.opacity(artwork == nil ? 0.45 : 0.32))
                     .background(Circle().fill(.ultraThinMaterial))

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Cuts Duet's shipping loops from CC0 Freesound recordings (sources in MixLayer/Resources/Sounds/CREDITS.md).
+# Cuts Duet's recorded loops from CC0 Freesound recordings (the noise discs are generated, Box breathing is san's own) (sources in MixLayer/Resources/Sounds/CREDITS.md).
 # Each loop is up to 10 minutes: the whole recording when shorter, minus a few seconds at each end for the seam.
 # Output: MixLayer/Resources/Sounds/<disc>.m4a, 128 kbps AAC, level-matched across discs (-21 dBFS RMS).
 #
@@ -16,15 +16,11 @@ MAX=600
 
 # disc  freesound-id
 LOOPS="steady-rain 547892
-porch-rain 454128
-rain-on-leaves 383064
-gentle-rain 575378
-woodland 434712
 blackbird 188371
 forest-wind 715696
 soft-surf 417797
-breakers 411509
-beach 457149"
+creek 637960
+coffee-shop 512253"
 
 echo "$LOOPS" | while read -r disc id; do
   src=$(find "$SRC" -name "$id.*" -type f | head -1)
