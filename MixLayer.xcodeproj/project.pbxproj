@@ -25,6 +25,7 @@
 		AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */; };
 		B004A33DAFA658453B351F93 /* AudioMetadataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57B6372699CE4A803DCFDC2 /* AudioMetadataCache.swift */; };
 		BF7661178E7309483B20C578 /* coffee-shop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5D4D048E6B06AC050CB3CF6E /* coffee-shop.m4a */; };
+		C0034003DCAD2A7FB4AD4E65 /* FeedbackInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38078D6F5182E8A91B9BF106 /* FeedbackInbox.swift */; };
 		C7B3AA129961CABD4B32E58F /* CREDITS.md in Resources */ = {isa = PBXBuildFile; fileRef = D62047E6C127441C1C6C2926 /* CREDITS.md */; };
 		CAE9815551DBDBAB3EFAD691 /* AudioPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22512484903EBC8456CB17 /* AudioPlayerModel.swift */; };
 		DEE9F57DB7FA03FBC1A04A4F /* forest-wind.m4a in Resources */ = {isa = PBXBuildFile; fileRef = C765F60DFDF45B1AF967CA33 /* forest-wind.m4a */; };
@@ -50,6 +51,7 @@
 		1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		20240D3D5D0D618FFD839FCD /* MixLayer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MixLayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		209D2B9F8812E1F0453AA14C /* FLACTagsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLACTagsTests.swift; sourceTree = "<group>"; };
+		38078D6F5182E8A91B9BF106 /* FeedbackInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackInbox.swift; sourceTree = "<group>"; };
 		507D43B59C98FDCA7F301309 /* DiscViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscViews.swift; sourceTree = "<group>"; };
 		55B60F06FDA1A5F09AE791F7 /* box-breathing.m4a */ = {isa = PBXFileReference; path = "box-breathing.m4a"; sourceTree = "<group>"; };
 		5B94B10CBB11DC5FB3494436 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				DBCAE3E696F830330ED7D710 /* AudioTrack.swift */,
 				1DF8C5B0C83FC2C2A8F41964 /* ContentView.swift */,
 				507D43B59C98FDCA7F301309 /* DiscViews.swift */,
+				38078D6F5182E8A91B9BF106 /* FeedbackInbox.swift */,
 				61B8B1F71BE57DAD18C865EF /* FLACTags.swift */,
 				612543094381786A9E1F77D9 /* Info.plist */,
 				F4D1E185E10402E0F6924AC0 /* MixLayerApp.swift */,
@@ -293,6 +296,7 @@
 				174C9AF3970E389DE63E4B12 /* ContentView.swift in Sources */,
 				21E87E2758A13BFEE4D123DD /* DiscViews.swift in Sources */,
 				73DCBB0AD5E225B2468F7992 /* FLACTags.swift in Sources */,
+				C0034003DCAD2A7FB4AD4E65 /* FeedbackInbox.swift in Sources */,
 				AE30ACAA13E9EE2538E138E6 /* MixLayerApp.swift in Sources */,
 				5E4C4061C76181C1A810D496 /* PlaybackLogic.swift in Sources */,
 				F2168220C5620C4ADF83E46D /* SoundCatalog.swift in Sources */,
