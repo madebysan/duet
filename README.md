@@ -21,6 +21,17 @@ Duet plays audio under whatever else your iPhone is playing. Start a rain loop, 
 - Files from iCloud or Google Drive become discs too, and remember where you stopped.
 - One screen: swipe between discs, tap to play, drag the ring to set the volume.
 
+## Ways to use it
+
+The built-in discs cover background sound. Your own files do the rest. Every file loops when it ends, so a short clip becomes a steady bed, and a long one picks up where you stopped.
+
+- **Background sound under a video.** Put on rain or brown noise, then watch YouTube. The video plays as usual and the rain stays at the level you set. A phone or FaceTime call pauses Duet.
+- **Practice along with a lesson.** Add a metronome click, a drum loop or a drone, then follow a guitar or singing lesson on YouTube. The loop keeps time underneath, even when you pause the video to try a part.
+- **Run or train to your own cues.** Load a click track at your running pace, or an interval timer's beeps, and put Spotify or a podcast on top.
+- **A guided meditation over your own music.** Play a meditation or breathing recording in Duet and a calm playlist in your music app, each at its own volume.
+- **An audiobook or lecture during a game.** Listen through a chapter while you play. Duet remembers the spot for next time.
+- **A sound from home.** Record your bedroom fan or a café you like with Voice Memos, add it to Duet, and fall asleep to it while a podcast plays on a sleep timer.
+
 ## How it works
 
 Duet opens its audio session as playback that mixes with others. iOS then lets it run alongside the app in front instead of interrupting it, with the screen off too. The lock screen shows the current disc with play, pause, next and previous.
