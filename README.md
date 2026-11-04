@@ -2,8 +2,8 @@
 
 <h1>Duet</h1>
 
-<p>An iPhone audio player that keeps playing under other apps.<br>
-Built-in nature, noise and café loops, or your own files, mixed under YouTube, podcasts or anything else.</p>
+<p>Audio that plays alongside any app.<br>
+An iPhone player for built-in nature, noise and café loops, or your own files, mixed under YouTube, podcasts or anything else.</p>
 
 <p><strong>Version 1.0</strong> · iOS 17 or later · iPhone</p>
 
