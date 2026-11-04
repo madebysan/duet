@@ -41,7 +41,7 @@ One disc plays at a time; there is no layering of two sounds. Portrait iPhone on
 
 ## Install
 
-Duet 1.0 was submitted to the App Store on October 18, 2026 and is waiting for review; the store link goes here when it is approved. Support is at [santiagoalonso.com/duet/support](https://santiagoalonso.com/duet/support).
+Duet is free on the [App Store](https://apps.apple.com/us/app/id6824279474). Version 1.0 came out on November 4, 2026. Support is at [santiagoalonso.com/duet/support](https://santiagoalonso.com/duet/support).
 
 To build it yourself you need Xcode 27 and [XcodeGen](https://github.com/yonaskolb/XcodeGen). Run `xcodegen generate`, open `MixLayer.xcodeproj`, and run the MixLayer scheme on a simulator or your iPhone. The source files, device install command, tests, scripts and release lanes are in [docs/how-it-works.md](docs/how-it-works.md).
 
